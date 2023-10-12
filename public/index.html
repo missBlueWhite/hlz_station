@@ -17,7 +17,8 @@
     function udSDKPluginInit() {
       console.log('----udSDKPluginInit--------')
       udSDKJS_RegisterShared()
-      udSDKJS_SetServerAddress('https://udstream.eulee.cn')
+      udSDKJS_SetServerAddress('https://udstream.eulee.cn')   //公网地址
+      // udSDKJS_SetServerAddress('http://21.82.116.98:61000')      //内网地址
       let udSDKReloadStatues = udSDKJS_Domain('CesiumJS')
       if(udSDKReloadStatues == 0){
         window.udsdkInitStatus = true

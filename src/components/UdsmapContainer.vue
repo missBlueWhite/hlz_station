@@ -84,9 +84,10 @@ const loadUdsModel = async (viewer: any) => {
   let csEulee = new udCesium(viewer);
   let udsModel = {
     key: "zgmx",
-    // url: "https://devmodels.oss-cn-shenzhen.aliyuncs.com/uploads/20230829/65eac27152bba461c88d400481f48758.uds",     //纠偏了的模型
+    url: "https://devmodels.oss-cn-shenzhen.aliyuncs.com/uploads/20230829/65eac27152bba461c88d400481f48758.uds",     //纠偏了的模型
     // url: 'https://10.11.8.118:8443/uds/changji2023new0703.uds',
-    url: 'http://21.82.116.98:61004/test.uds',
+    // url: 'http://21.82.116.98:61004/test.uds',
+    // url:'http://21.82.116.98:61004/cjhlz.uds',
     eval: [100.0, 4978],
     // offsetPosition: [6, 25, -517.2]  //内网仓吉模型的纠偏量
     offsetPosition: [0, 0, -7.2]
