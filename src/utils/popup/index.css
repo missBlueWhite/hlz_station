@@ -1,0 +1,107 @@
+        /* pop框css*/
+        .cesium-popup-panel {
+            position: absolute;
+            z-index: 100;
+            min-width: 290px;
+            background: rgba(15, 39, 49, 0.85);
+            border-radius: 8px;
+        }
+
+        .cesium-popup-tip-panel {
+            width: 40px;
+            height: 24px;
+            position: absolute;
+            left: 50%;
+            bottom: -25px;
+            margin-left: -20px;
+            overflow: hidden;
+            pointer-events: none;
+            opacity: 0.8;
+            animation: heart 1.3s ease-in-out 2.7s infinite alternate;
+        }
+        @keyframes heart {
+          from {
+            transform: translate(0, -5px);
+          }
+          to {
+            transform: translate(0, 1px);
+          }
+        }
+        .cesium-popup-tip-bottom {
+            width: 24px;
+            height: 24px;
+            margin: 5px auto 0;
+            /* width: 17px;
+            background: rgba(23, 50, 108, 0.8);
+            border-bottom: 1px solid #00ABC8;
+            height: 17px;
+            padding: 1px;
+            margin: -10px auto 0;
+            -webkit-transform: rotate(45deg);
+            -moz-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg); */
+        }
+
+        .cesium-popup-header-panel {
+            height: 40px;
+            padding: 5px 15px;
+            background: linear-gradient(90deg, #3998BA 3.6%, rgba(57, 152, 186, 0.5) 105.74%);
+            border-radius: 8px 8px 0px 0px;
+        }
+
+        .cesium-poput-header-title {
+            font-family: Microsoft YaHei;
+            font-style: normal;
+            color: #F2F8FF;
+        }
+
+        .cesium-popup-content-panel {
+            padding: 18px;
+            color: #fff;
+            width: 100%;
+        }
+
+        .cesium-popup-content-panel>div {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+        }
+
+        .cesium-popup-close-btn {
+            float: right;
+            position: relative;
+            right: 12px;
+            top: 2px;
+            z-index: 999;
+        }
+
+        .close-popup-btn {
+            color: #00ABC8;
+            font-size: 18px;
+        }
+
+        .cesium-popup-close-btn,
+        .cesium-popup-close-btn:focus {
+            cursor: pointer;
+        }
+
+        .cesium-popup-close-btn>svg:hover {
+            color: #00ABC8 !important;
+        }
+
+        .cesium-popup-close-btn>svg {
+            user-select: auto;
+            color: #00ABC8;
+            cursor: pointer;
+            width: 15px;
+            /* height: 15px; */
+        }
+
+        .cesium-popup-close-btn>svg>path {
+            color: #00ABC8;
+        }
+
+        .title-label {
+            color: #00ABC8;
+        }

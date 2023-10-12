@@ -1,1 +1,0 @@
-declare export function addsub(a: number, b: number, c: number): number;

@@ -1,24 +1,115 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
-    <title><%= htmlWebpackPlugin.options.title %></title>
-    <script src="./js/Cesium/Cesium.js"></script>
-    <link rel="stylesheet" href="./js/Cesium/Widgets/widgets.css">
-    <style>
-      html, body {
-          width: 100%;
-          height: 100%;
-          margin: 0px;
-          padding: 0px;
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+  <title>
+    <%= htmlWebpackPlugin.options.title %>
+  </title>
+  <script src="./js/Cesium/Cesium.js"></script>
+  <link rel="stylesheet" href="./js/Cesium/Widgets/widgets.css">
+  <script async src="./UDSDK/udSDKjs.js"></script>
+  <script async src="./UDSDK/easyudSDKjs.js"></script>
+  <script>
+    function udSDKPluginInit() {
+      console.log('----udSDKPluginInit--------')
+      udSDKJS_RegisterShared()
+      udSDKJS_SetServerAddress('https://udstream.eulee.cn')
+      let udSDKReloadStatues = udSDKJS_Domain('CesiumJS')
+      if(udSDKReloadStatues == 0){
+        window.udsdkInitStatus = true
       }
+    };
+
+    var Module = {
+      noExitRuntime: true,
+      preRun: [],
+      postRun: udSDKPluginInit,
+      setStatus: function (text) {
+        if (!Module.setStatus.last)
+          Module.setStatus.last = {
+            time: Date.now(),
+            text: ''
+          }
+        if (text === Module.setStatus.last.text) return
+        var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/)
+        var now = Date.now()
+        if (m && now - Module.setStatus.last.time < 30) return // if this is a progress update, skip it if too soon
+
+        Module.setStatus.last.time = now
+        Module.setStatus.last.text = text
+        if (m) {
+          text = m[1]
+        }
+      },
+      totalDependencies: 0,
+      monitorRunDependencies: function (left) {
+        this.totalDependencies = Math.max(this.totalDependencies, left)
+        Module.setStatus(left ? 'Preparing....----... (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')' : 'All downloads complete.')
+      }
+    }
+
+    Module.setStatus("Downloading...");
+
+
+    // var Module = {
+    //     noExitRuntime: true,
+    //     preRun: [],
+    //     postRun: udSDKInit,
+    //     setStatus: function (text) {
+    //       if (!Module.setStatus.last)
+    //         Module.setStatus.last = { time: Date.now(), text: "" };
+
+    //       if (text === Module.setStatus.last.text) return;
+
+    //       var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+    //       var now = Date.now();
+    //       if (m && now - Module.setStatus.last.time < 30) return; // if this is a progress update, skip it if too soon
+
+    //       Module.setStatus.last.time = now;
+    //       Module.setStatus.last.text = text;
+    //       if (m) {
+    //         text = m[1];
+    //       }
+
+    //       console.log(text);
+    //     },
+    //     totalDependencies: 0,
+    //     monitorRunDependencies: function (left) {
+    //       this.totalDependencies = Math.max(this.totalDependencies, left);
+    //       Module.setStatus(
+    //         left
+    //           ? "Preparing... (" +
+    //               (this.totalDependencies - left) +
+    //               "/" +
+    //               this.totalDependencies +
+    //               ")"
+    //           : "All downloads complete."
+    //       );
+    //     },
+    //   };
+
+    //   Module.setStatus("Downloading...");
+
+
+  </script>
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0px;
+      padding: 0px;
+    }
   </style>
-  </head>
-  <body>
-    <div id="app" style="width: 100%; height: 100%; background: grey; position: relative;"></div>
-    <!-- built files will be auto injected -->
-  </body>
+</head>
+
+<body>
+  <div id="app" style="width: 100%; height: 100%; background: grey; position: relative;"></div>
+</body>
+
+
 </html>
