@@ -85,7 +85,7 @@ const loadUdsModel = async (viewer: any) => {
   let udsModel = {
     key: "zgmx",
     // url: "https://devmodels.oss-cn-shenzhen.aliyuncs.com/uploads/20230829/65eac27152bba461c88d400481f48758.uds",     //纠偏了的模型  
-    url: "https://devmodels.oss-cn-shenzhen.aliyuncs.com/uploads/20231012/0a781561b09f4d398251cb6d5bf8eedf.uds4",        //昌吉 
+    url: "https://devmodels.oss-cn-shenzhen.aliyuncs.com/uploads/20231012/0a781561b09f4d398251cb6d5bf8eedf.uds",        //昌吉 
     // url: 'https://10.11.8.118:8443/uds/changji2023new0703.uds',
     // url: 'http://21.82.116.98:61004/test.uds',
     // url:'http://21.82.116.98:61004/cjhlz.uds',

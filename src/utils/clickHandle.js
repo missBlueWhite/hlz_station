@@ -154,12 +154,11 @@ export class MapClickHandler {
                 this.roamHandlerInstance.startRoam()
             }
         }, 500)
-
     }
 
     //区域面积的点击
     _areaHandleClick(clickEntity) {
-        if(!clickEntity.id.name) return
+        if (!clickEntity.id.name) return
         //通过名称找打区域值中的数据
         let areaData = sceneList.find(item => item.name == clickEntity.id.name)
         let viewer = this.viewer
