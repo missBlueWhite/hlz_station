@@ -9,6 +9,7 @@ export class SceneAreaManager {
         this.myCustomAreaDataSource = new Cesium.CustomDataSource('areaCollection'); //用来存放所有的标注点
         this.viewer.dataSources.add(this.myCustomAreaDataSource);
         this.initAreaRange()
+        this.initHeigtAreaRange()
         this.initAreaCenter()
     }
 
@@ -20,10 +21,14 @@ export class SceneAreaManager {
             console.log('相机移动完成');
             let mapLevel = self.getZoomLevel()
             console.log('mapLevel', mapLevel)
-            if (mapLevel < 15) {
+            if (mapLevel < 16) {
                 // todo=>在此处进行场景的切换   展示全局的场景面板数据
                 console.log('全局的场景展示......')
+                let staffDataSources = self.viewer.dataSources.getByName('areaCollection')[0]
+                staffDataSources.show = true
             } else {
+                let staffDataSources = self.viewer.dataSources.getByName('areaCollection')[0]
+                staffDataSources.show = false
                 let centerPoint = self.getCenterScreenPoint()
                 console.log('centerPoint', centerPoint)
                 if (!centerPoint || centerPoint.length === 0) return;
@@ -104,6 +109,36 @@ export class SceneAreaManager {
         return inside;
     }
 
+    //初始化区域盖住的面
+    initHeigtAreaRange() {
+        // 绘制墙体
+        for (let i = 0; i < sceneList.length; i++) {
+            let positions = Cesium.Cartesian3.fromDegreesArray(sceneList[i].region);
+            // let positions = Cesium.Cartesian3.fromDegreesArrayHeights(sceneList[i].region.push(30));
+            this.myCustomAreaDataSource.entities.add({
+                // name: "heightPolygon" + i,
+                name:sceneList[i].name,
+                type: 'heightPolygon',    // 图标
+                polygon: {
+                    hierarchy:positions,
+                    // hierarchy: Cesium.Cartesian3.fromDegreesArrayHeights([
+                    //   -108.0,
+                    //   42.0,
+                    //   -100.0,
+                    //   42.0,
+                    //   -104.0,
+                    //   40.0,
+                    // ]),
+                    // extrudedHeight: 500000.0,
+                    // material: Cesium.Color.GREEN,
+                    material: Cesium.Color.fromBytes(76, 212, 224).withAlpha(0.7),
+                    closeTop: false,
+                    closeBottom: false,
+                  },
+            })
+        }
+    }
+
     //初始化区域的范围
     initAreaRange() {
         // 绘制墙体
@@ -136,7 +171,6 @@ export class SceneAreaManager {
             let semiMinorAxis = 3.0; // 圆的半短轴（单位：米）
             let rotation = Cesium.Math.toRadians(45.0); // 圆的旋转角度
             let granularity = Cesium.Math.toRadians(1.0); // 圆的细节程度
-
             // 创建圆的几何对象
             let circleGeometry = new Cesium.EllipseGeometry({
                 center: center,

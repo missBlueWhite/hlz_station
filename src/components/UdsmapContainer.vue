@@ -84,15 +84,17 @@ const loadUdsModel = async (viewer: any) => {
   let csEulee = new udCesium(viewer);
   let udsModel = {
     key: "zgmx",
-    url: "https://devmodels.oss-cn-shenzhen.aliyuncs.com/uploads/20230829/65eac27152bba461c88d400481f48758.uds",     //纠偏了的模型
+    // url: "https://devmodels.oss-cn-shenzhen.aliyuncs.com/uploads/20230829/65eac27152bba461c88d400481f48758.uds",     //纠偏了的模型  
+    url: "https://devmodels.oss-cn-shenzhen.aliyuncs.com/uploads/20231012/0a781561b09f4d398251cb6d5bf8eedf.uds4",        //昌吉 
     // url: 'https://10.11.8.118:8443/uds/changji2023new0703.uds',
     // url: 'http://21.82.116.98:61004/test.uds',
     // url:'http://21.82.116.98:61004/cjhlz.uds',
     eval: [100.0, 4978],
-    // offsetPosition: [6, 25, -517.2]  //内网仓吉模型的纠偏量
-    offsetPosition: [0, 0, -7.2]
+    offsetPosition: [6, 25, -517.2]  //内网仓吉模型的纠偏量
+    // offsetPosition: [0, 0, -9.2],
   };
-  csEulee.loadUds(udsModel)
+  csEulee.loadUds(udsModel, [68534.36702072641, 4544158.915943371, 4460432.1562001])
+  // csEulee.loadUds(udsModel)
 }
 
 //初始化底图
@@ -116,6 +118,7 @@ const initMap = (container: HTMLElement) => {
     infoBox: false,
     selectionIndicator: false,
     animation: true,
+    shouldAnimate: true,
     timeline: false,
     baseLayerPicker: false,
     vrButton: false, // VR模式
@@ -124,10 +127,10 @@ const initMap = (container: HTMLElement) => {
     sceneModePicker: false,//场景模式 切换2D 3D和 Columbus View（cv）模式
     navigationHelpButton: false,//帮助提示，如何操作数字地球
     fullscreenButton: false,
-    baseLayerPicker: false,
-    baseLayer: new Cesium.ImageryLayer(new Cesium.UrlTemplateImageryProvider({
-      url: 'http://21.82.116.98:61002/MapServer/mbtiles/global0-10xinjiang11-16/{x}/{y}/{z}', //服务地址
-    })),
+    // baseLayerPicker: false,
+    // baseLayer: new Cesium.ImageryLayer(new Cesium.UrlTemplateImageryProvider({
+    //   url: 'http://21.82.116.98:61002/MapServer/mbtiles/global0-10xinjiang11-16/{x}/{y}/{z}', //服务地址
+    // })),
   })
 
   // todo=> 在内网里面上述的底图地址换成内网的地址
@@ -144,6 +147,64 @@ const initMap = (container: HTMLElement) => {
   // 隐藏 animation 控件
   _viewer.animation.container.style.visibility = 'hidden';
 
+  setTimeout(() => {
+    addDymicLine()
+  }, 6000)
+
+
+  // // 创建一个函数，用于更新相机信息
+  // function updateCameraInfo() {
+  //   // 获取当前相机
+  //   var camera = _viewer.camera;
+  //   // 打印相机的位置和方向
+  //   console.log('Camera Position:', camera.position);
+  //   console.log('Camera Direction:', camera.direction);
+  //   console.log('Camera Up:', camera.up);
+  //   console.log('Camera Right:', camera.right);
+
+  //   // 打印相机的方位角、俯仰角和滚转角（以弧度为单位）
+  //   console.log('Camera Heading (Radians):', camera.heading);
+  //   console.log('Camera Pitch (Radians):', camera.pitch);
+  //   console.log('Camera Roll (Radians):', camera.roll);
+  //   // 使用requestAnimationFrame继续更新相机信息
+  //   requestAnimationFrame(updateCameraInfo);
+  // }
+
+  // // 启动相机信息更新
+  // updateCameraInfo();
+
+}
+
+//测试加载动态的折线
+const addDymicLine = () => {
+  console.log('add line--------')
+  //更新连线的位置
+  // 创建一个SampledPositionProperty对象
+  let linePath = new Cesium.SampledPositionProperty();
+
+  // 添加线的坐标样本
+  let startTime = Cesium.JulianDate.now();
+  linePath.addSample(startTime, Cesium.Cartesian3.fromDegrees(113.52987165698563, 22.80379039702072, 0));
+  linePath.addSample(Cesium.JulianDate.addSeconds(startTime, 1.0, new Cesium.JulianDate()), Cesium.Cartesian3.fromDegrees(113.52987165698563, 22.80379039702072, 10000));
+  linePath.addSample(Cesium.JulianDate.addSeconds(startTime, 2.0, new Cesium.JulianDate()), Cesium.Cartesian3.fromDegrees(113.52987165698563, 22.80379039702072, 1000));
+
+  // 创建线实体
+  let lineEntity = _viewer.entities.add({
+    polyline: {
+      positions: linePath,
+      width: 5,
+      material: Cesium.Color.RED,
+    },
+  });
+
+  // 设置时间轴以观察线的动画效果
+  _viewer.clock.startTime = startTime.clone();
+  _viewer.clock.stopTime = Cesium.JulianDate.addSeconds(startTime, 4.0, new Cesium.JulianDate());
+  _viewer.clock.currentTime = startTime.clone();
+  _viewer.clock.multiplier = 1;
+  _viewer.clock.shouldAnimate = true;
+
+  _viewer.zoomTo(lineEntity);
 }
 
 //新建天空盒子
@@ -171,7 +232,7 @@ const cameraManagerFun = () => {
 
 //人员管理
 const staffManageFun = () => {
-  let staffManageInstance = new StaffManage(_viewer)
+  staffManageInstance = new StaffManage(_viewer)
   //模拟出100个人员点位
   // 四个边界点
   let north = Cesium.Cartesian3.fromDegrees(113.55941409163184, 22.828641109181433, -6293.092289876425);
@@ -181,20 +242,20 @@ const staffManageFun = () => {
 
   //模拟数据 插值100个随机点////////////////////////////////////
   let staffListRes = []
-  let originPoint = [113.5493956319916, 22.79948679264272, 0.46735028600700784]
+  let originPoint = [89.12702533070753, 44.661725349674015, -2.6249673468814425]
   let colors = ['#DF5D5D', '#67DF5D', '#5DDFCE', '#3668B1', '#AD4ECB', '#E77B4F', '#9189D0', '#EA91A4']
   let typeNameList = ['安监部监督人', '省级到岗', '地市到岗', '工作班成员', '工作负责人', '设备部监督人', '县级到岗', '运检部监督人']
   let centerPointList = [
-    [113.52921733495529, 22.800116860285616, -1.5081470232585377],
-    [113.54117399137431, 22.80142973544119, 4.637629094364569],
-    [113.56124820736514, 22.80435789438329, 3.132505723890629],
-    [113.54751992958181, 22.805140002373346, 2.3600184408125617],
-    [113.55316928015714, 22.80546220633305, 13.940619346345267],
-    [113.55864671621023, 22.81078628143312, 45.6525841996821],
-    [113.5660295586771, 22.807353875058034, 40.493010328602494],
-    [113.52900272911997, 22.788773176003975, 8.451228577763636],
+    [89.12702533070753, 44.661725349674015, -2.6249673468814425],
+    [89.12520103051236, 44.662843316449404, -3.234319187107207],
+    [89.12875340921346, 44.6592999730898, -3.2574661170825006],
+    [89.12545853722375, 44.65978259038007, -3.2303974154066855],
+    [89.12875340921346, 44.6592999730898, -3.2574661170825006],
+    [89.12975340921346, 44.6602999730898, -3.2574661170825006],
+    [89.12540103051236, 44.663043316449404, -3.234319187107207],
+    [89.12712533070753, 44.661925349674015, -2.6249673468814425],
   ]
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < 60; i++) {
     let randomInteger = Math.floor(Math.random() * 8);
     // 获取经度和纬度
     let longitude = originPoint[0] + Math.random() * 0.01;
@@ -219,7 +280,6 @@ const staffManageFun = () => {
 
 
   ////////////////////以上都是模拟数据   后期需要从数据库取///////////////////
-
   staffManageInstance.initStaffList(staffListRes)
 }
 
@@ -271,11 +331,10 @@ const updateAllStaffPosition = async () => {
   if (!staffManageInstance) {
     staffManageInstance = new StaffManage(_viewer)
   }
-  //更新频率
+  //更新频率  两秒请求一次接口
   setTimIntervalIndex = setInterval(() => {
     let staffListRes = []
     let originPoint = [113.5493956319916, 22.79948679264272, 0.46735028600700784]
-
     let colors = ['#DF5D5D', '#67DF5D', '#5DDFCE', '#3668B1', '#AD4ECB', '#E77B4F', '#9189D0', '#EA91A4']
     let typeNameList = ['安监部监督人', '省级到岗', '地市到岗', '工作班成员', '工作负责人', '设备部监督人', '县级到岗', '运检部监督人']
     let centerPointList = [
@@ -288,7 +347,7 @@ const updateAllStaffPosition = async () => {
       [113.5660295586771, 22.807353875058034, 40.493010328602494],
       [113.52900272911997, 22.788773176003975, 8.451228577763636],
     ]
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 60; i++) {
       let randomInteger = Math.floor(Math.random() * 8);
       // 获取经度和纬度
       let longitude = originPoint[0] + Math.random() * 0.01;
@@ -307,12 +366,12 @@ const updateAllStaffPosition = async () => {
         type: "Addupdate",
         centerPoint: centerPointList[randomInteger],
         isAlarm: Math.random() > 0.5 ? false : true
-
       }
       staffListRes.push(staffItem)
     }
     staffManageInstance.updataStaffList(staffListRes)
-  }, 1000)
+    console.log('updateAllStaffPosition--------------')
+  }, 2000)
 
 }
 

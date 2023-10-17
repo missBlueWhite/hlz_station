@@ -4,6 +4,8 @@ import { CesiumPopup } from './popup/index'  //弹窗的样式   目前所有的
 //漫游相关的类
 import { RoamHandler } from './RoamHandler'
 
+import { sceneList } from '../mockData/mockData.js'  //场景的数据
+
 export class MapClickHandler {
     constructor(viewer) {
         this.viewer = viewer;
@@ -64,6 +66,10 @@ export class MapClickHandler {
                 relationWorkPlanid: "003da06c-47e4-6267-2e75-7a38ed7db975"
             }
             this._staffClickHander(clickEntity, params)
+        } else if (clickEntityType == 'heightPolygon') {
+            console.log('点击了高度面')
+            // console.log('clickEntity', clickEntity.id.name)
+            this._areaHandleClick(clickEntity)
         }
     }
 
@@ -143,7 +149,7 @@ export class MapClickHandler {
             let clickDom = document.getElementById('staffPathId')
             clickDom.onclick = () => {
                 let staffPathId = clickDom.innerText
-                console.log('点击了轨迹',staffPathId)
+                console.log('点击了轨迹', staffPathId)
                 // todo=>根据id获取人员的轨迹    然后进行轨迹的展示
                 this.roamHandlerInstance.startRoam()
             }
@@ -151,5 +157,28 @@ export class MapClickHandler {
 
     }
 
-
+    //区域面积的点击
+    _areaHandleClick(clickEntity) {
+        if(!clickEntity.id.name) return
+        //通过名称找打区域值中的数据
+        let areaData = sceneList.find(item => item.name == clickEntity.id.name)
+        let viewer = this.viewer
+        // 目标位置
+        let destination = new Cesium.Cartesian3(areaData.camera[0], areaData.camera[1], areaData.camera[2])
+        // 目标方向（heading）、俯仰角（pitch）和滚转角（roll）（以弧度为单位）
+        let heading = areaData.prh[0] // Cesium.Math.toRadians(90); // 90度的方向（东方）
+        let pitch = areaData.prh[1] // Cesium.Math.toRadians(30); // 30度的俯仰角
+        let roll = areaData.prh[2]; // 转角
+        // viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(Cesium.Cartesian3.fromDegrees(location.position[0], location.position[1], location.position[2]), 500 + location.offset / 10))
+        // 使用camera.flyTo进行飞行
+        viewer.camera.flyTo({
+            destination: destination,
+            orientation: {
+                heading: heading,
+                pitch: pitch,
+                roll: roll
+            },
+            duration: 1.2 // 飞行的持续时间（秒）
+        });
+    }
 }
