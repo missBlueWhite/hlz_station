@@ -41,7 +41,6 @@ export class RoamHandler {
         });
 
 
-
         let entity = this.createRoamStaffPoint([113.52987165698563, 22.80379039702072, 0.8444008388955215], 'xxxxxx', [1.0, 0.7529, 0.0, 0.7])
         this.createRoamPath(personTrackData)
 
@@ -50,7 +49,7 @@ export class RoamHandler {
         clock.startTime = Cesium.JulianDate.fromIso8601('2023-09-01T00:00:00Z');
         clock.stopTime = Cesium.JulianDate.fromIso8601('2023-09-01T00:02:30Z');
         clock.currentTime = Cesium.JulianDate.fromIso8601('2023-09-01T00:00:00Z');
-        clock.clockRange = Cesium.ClockRange.LOOP_STOP; // 设置时钟循环模式
+        // clock.clockRange = Cesium.ClockRange.LOOP_STOP; // 设置时钟循环模式
         // 创建路径属性
         let positionProperty = new Cesium.SampledPositionProperty();
         trackData.forEach(function (data) {

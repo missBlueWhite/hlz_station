@@ -16,49 +16,178 @@ export class StaffManage {
         this.myCustomDataSource = new Cesium.CustomDataSource("staffListCollection"); //用来存放所有的标注点
         this.myCustomLabelDataSource = new Cesium.CustomDataSource('staffListLabelCollection'); //用来存放所有标注点的详细信息
         this.myCustomLineDataSource = new Cesium.CustomDataSource('staffListLineCollection'); //用来存放所有标注点的连线
+        this.modelPrimitiveCollection = new Cesium.PrimitiveCollection();  //用来存放模型的primitive
         this.viewer.dataSources.add(this.myCustomDataSource);
         this.viewer.dataSources.add(this.myCustomLabelDataSource);
         this.viewer.dataSources.add(this.myCustomLineDataSource);
+        this.viewer.scene.primitives.add(this.modelPrimitiveCollection);  // Add collection
         this.myCustomLabelDataSource.show = false
-        // this.myCustomDataSource.show = false
-        // this.detailInfoShow = false
-        // this.myCustomDataSource = viewer
-        // this.myCustomDataSource = new Cesium.EntityCollection(); //用来存放所有的标注点
-        // this.viewer.entities.add(this.myCustomDataSource);
-        // this.primitiveCollection = new Cesium.PrimitiveCollection();
-        // this.viewer.scene.primitives.add(this.primitiveCollection);  // Add collection
+
+        this.preStaffList = []   //上一次的人员的位置信息
+        this.nextStaffList = []  //下一次的人员的位置信息
+
     }
 
     initStaffList(listData) {
         if (!listData || listData.length === 0) return;
         //进行人员的初始化
         for (let i = 0; i < listData.length; i++) {
+            //记录上一次的人员的位置信息
+            this.preStaffList.push({
+                relationWorkPlanid: listData[i].relationWorkPlanid,
+                point: listData[i].point,
+                centerPoint: listData[i].centerPoint
+            })
+
             //增加
             if (listData[i].type == 'Addupdate') {
-                this.addStaff(listData[i])
+                this.addStaff(listData[i])  //加载人员点位 标注  连线等等
             } else if (listData[i].type == 'Del') {
                 //删除
                 this.deleteStaff(listData[i].id)
             }
-
         }
+
     }
+
 
     updataStaffList(listData) {
         if (!listData || listData.length === 0) return;
-        //进行人员的更新
+        // 进行人员的更新
         let findListInstance = this.viewer.dataSources.getByName('staffListCollection')[0].entities
         let findListLabelInstance = this.viewer.dataSources.getByName('staffListLabelCollection')[0].entities
-        let findListLineInstance = this.viewer.dataSources.getByName('staffListLineCollection')[0].entities
+        // 将人员之前的位置与需要更新的进行插值
+        let startTime = Cesium.JulianDate.fromDate(new Date());
         for (let i = 0; i < listData.length; i++) {
+            let findPreStaff = this.preStaffList.find(item => item.relationWorkPlanid == listData[i].relationWorkPlanid)
             let findInstance = findListInstance.getById(listData[i].relationWorkPlanid)
             let findLabelInstance = findListLabelInstance.getById(listData[i].relationWorkPlanid + 'lable')
-            let findLineInstance = findListLineInstance.getById(listData[i].relationWorkPlanid + 'line')
-            if (findInstance && findLabelInstance && findLineInstance) {
-                this._updateSingleStaffEntity(findInstance, findLabelInstance, findLineInstance, listData[i])
+            if (findPreStaff && findInstance && findLabelInstance) {
+                this._updataStaffPositonWithPositionProperty(startTime, findPreStaff, listData[i], findInstance, findLabelInstance)
+                // this._updataStaffPositonWithCallback(findPreStaff, listData[i], findInstance, findLabelInstance)
             }
         }
+
+        this.viewer.clock.shouldAnimate = true;
+
+        //位置更新完之后  重新更新this.preStaffList的数据
+        for (let k = 0; k < listData.length; k++) {
+            this.preStaffList.push({
+                relationWorkPlanid: listData[k].relationWorkPlanid,
+                point: listData[k].point,
+                centerPoint: listData[k].centerPoint
+            })
+        }
+
+        // // 进行人员的更新
+        // let findListInstance = this.viewer.dataSources.getByName('staffListCollection')[0].entities
+        // let findListLabelInstance = this.viewer.dataSources.getByName('staffListLabelCollection')[0].entities
+        // let findListLineInstance = this.viewer.dataSources.getByName('staffListLineCollection')[0].entities
+        // for (let i = 0; i < listData.length; i++) {
+        //     let findInstance = findListInstance.getById(listData[i].relationWorkPlanid)
+        //     let findLabelInstance = findListLabelInstance.getById(listData[i].relationWorkPlanid + 'lable')
+        //     let findLineInstance = findListLineInstance.getById(listData[i].relationWorkPlanid + 'line')
+        //     if (findInstance && findLabelInstance && findLineInstance) {
+        //         this._updateSingleStaffEntity(findInstance, findLabelInstance, findLineInstance, listData[i])
+        //     }
+        // }
     }
+
+
+    //用回调函数更新位置
+    async _updataStaffPositonWithCallback(oldInfo, newInfo, entity, entityLabel) {
+        let positionsOld = Cesium.Cartesian3.fromDegrees(oldInfo.point[0], oldInfo.point[1], oldInfo.point[2]);
+        let positionsNew = Cesium.Cartesian3.fromDegrees(newInfo.point[0], newInfo.point[1], newInfo.point[2]);
+        let numberOfSamples = 200;
+        for (let i = 0; i <= numberOfSamples; ++i) {
+            await sleep(16.66)
+            const factor = i / numberOfSamples;
+            const locationFactor = Math.pow(factor, 2);
+            const location = Cesium.Cartesian3.lerp(
+                positionsOld,  //传递的上一个坐标
+                positionsNew,  //传递的下一个坐标
+                locationFactor,
+                new Cesium.Cartesian3()
+            );
+            let newPositions = new Cesium.CallbackProperty(function () {
+                return location
+            }, false);
+
+            entity._position = newPositions
+            entityLabel._position = newPositions
+        }
+
+    }
+
+    //用SampledPositionProperty更新位置  目前感觉这个方式是最优的
+    _updataStaffPositonWithPositionProperty(start, oldInfo, newInfo, entity, entityLabel) {
+        let positionsOld = Cesium.Cartesian3.fromDegrees(oldInfo.point[0], oldInfo.point[1], oldInfo.point[2]);
+        let positionsNew = Cesium.Cartesian3.fromDegrees(newInfo.point[0], newInfo.point[1], newInfo.point[2]);
+        let numberOfSamples = 100;
+        let totalSeconds = 3;  //动画时间执行完毕
+        let positionsProperty = new Cesium.SampledPositionProperty();
+        for (let i = 0; i <= numberOfSamples; ++i) {
+            const factor = i / numberOfSamples;
+            const time = Cesium.JulianDate.addSeconds(
+                start,
+                factor * totalSeconds,
+                new Cesium.JulianDate()
+            );
+            const locationFactor = Math.pow(factor, 2);
+            const location = Cesium.Cartesian3.lerp(
+                positionsOld,  //传递的上一个坐标
+                positionsNew,  //传递的下一个坐标
+                locationFactor,
+                new Cesium.Cartesian3()
+            );
+            positionsProperty.addSample(time, location);
+        }
+        entity.position = positionsProperty;          //最后更新entity实体的坐标位置
+        entity.orientation = new Cesium.VelocityOrientationProperty(positionsProperty)
+        entityLabel.position = positionsProperty;     //更新标注的位置
+    }
+
+
+    iii(oldInfo, newInfo) {
+        let startTime = Cesium.JulianDate.fromDate(new Date());
+        const getPosition = (startP, endP, duration) => {
+            return new Promise((resolve) => {
+                let arr = []
+                duration = duration * 1000
+                for (let i = 0; i <= duration; i = i++) {
+                    let pos = Cesium.Cartesian3.lerp(startP, endP, i / duration, new Cesium.Cartesian3());
+                    const time = Cesium.JulianDate.addSeconds(
+                        startTime,
+                        duration,
+                        new Cesium.JulianDate()
+                    );
+                    arr.push(pos)
+                }
+                // if (duration % forNum !== 0) {
+                //     arr.push(endP)
+                // }
+                resolve(arr);
+            })
+        }
+
+
+        const po1 = Cesium.Cartesian3.fromDegrees(oldInfo.point[0], oldInfo.point[1], oldInfo.point[2])
+        const po2 = Cesium.Cartesian3.fromDegrees(newInfo.point[0], newInfo.point[1], newInfo.point[2])
+        getPosition(po1, po2, 2).then((res) => {
+            // showPath = showPath.concat(res)
+            // pathIndex++
+            // maxIndex = showPath.length
+            const location = Cesium.Cartesian3.lerp(
+                positionsOld,  //传递的上一个坐标
+                positionsNew,  //传递的下一个坐标
+                locationFactor,
+                new Cesium.Cartesian3()
+            );
+        })
+
+
+    }
+
 
     _updateSingleStaffEntity(findEntity, findDetailEntity, findLineEntity, staffData) {
         let lon = staffData.point[0]
@@ -119,7 +248,6 @@ export class StaffManage {
             ])
             lineFindInstance.polyline.positions = linePositions_tow;
         }
-
         // let linePositions = [];
         // linePositions.push(new Cesium.Cartesian3.fromDegrees(long, lat, 0));
         // linePositions.push(new Cesium.Cartesian3.fromDegrees(long, lat, height));
@@ -150,7 +278,7 @@ export class StaffManage {
         let id = staffData.relationWorkPlanid;
         let long = staffData.point[0]
         let lat = staffData.point[1]
-        let height = staffData.point[2] * 1.5
+        let height = staffData.point[2] * 0.4
         let theTxt = staffData.name  //名字
         let textBg = [0.38039, 0.364705, 0.388235, 0.5]
         if (staffData.level == '1') {
@@ -168,9 +296,9 @@ export class StaffManage {
         // 先画线后画点，防止线压盖点
         let linePositions = [];
         linePositions.push(new Cesium.Cartesian3.fromDegrees(long, lat, 0));
-        linePositions.push(new Cesium.Cartesian3.fromDegrees(long, lat, height));
+        linePositions.push(new Cesium.Cartesian3.fromDegrees(long, lat, height * 0.4));
         let linePositions_tow = []
-        linePositions_tow.push(new Cesium.Cartesian3.fromDegrees(long, lat, staffData.point[2]));
+        linePositions_tow.push(new Cesium.Cartesian3.fromDegrees(long, lat, staffData.point[2] * 0.3));
         if (staffData.centerPoint.length > 0) {
             linePositions_tow.push(new Cesium.Cartesian3.fromDegrees(staffData.centerPoint[0], staffData.centerPoint[1], staffData.centerPoint[2]));
             if (staffData.isAlarm) {
@@ -194,6 +322,7 @@ export class StaffManage {
             }
 
         }
+
         _drawCanvasImageName(staffData).then(res => {
             this.myCustomDataSource.entities.add({
                 show: isShow,
@@ -231,18 +360,89 @@ export class StaffManage {
                 //     // disableDepthTestDistance: Number.POSITIVE_INFINITY
                 //     // distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 200)
                 // },
-                polyline: {
-                    positions: linePositions,
-                    width: 1,
-                    // material: lineMaterial
+                // 竖直的线段
+                // polyline: {
+                //     positions: linePositions,
+                //     width: 1,
+                //     // material: lineMaterial
+                // },
+
+                // model: {
+                //     uri: './model/Cesium_Man.glb',
+                //     scale: 2.5,
+                //     minimumPixelSize: 50, //最小像素大小，可以避免太小看不见
+                //     clampToGround: true,
+                // },
+                model: {
+                    uri: "./model/walk.glb",
+                    scale: 5,
+                    minimumPixelSize: 30, //最小像素大小，可以避免太小看不见
+                    clampToGround: true,
+                    // maximumScale: 20000,//模型的最大比例尺大小。minimumPixelSize的上限  
+                    incrementallyLoadTextures: true,//加载模型后纹理是否可以继续流入
+                    // runAnimations: true,//是否启动模型中制定的gltf动画
+                    // clampAnimations: true,//制定gltf动画是否在没有关键帧的持续时间内保持最后一个姿势
+                    // shadows: Cesium.ShadowMode.ENABLED,
+                    // heightReference: Cesium.HeightReference.NONE
                 },
             });
+
+
+            // //加载人物的模型
+            // // Position a model with modelMatrix and display it with a minimum size of 128 pixels
+            // const headingPositionRoll = new Cesium.HeadingPitchRoll();
+            // const fixedFrameTransform = Cesium.Transforms.localFrameToFixedFrameGenerator(
+            //     "north",
+            //     "west"
+            // );
+            // let animations;
+            // try {
+            //     Cesium.Model.fromGltfAsync({
+            //         url: "./model/walk.glb",
+            //         gltfCallback: gltf => {
+            //             animations = gltf.animations
+
+            //         },
+            //         // color: Cesium.Color.RED,
+            //         silhouetteColor: Cesium.Color.GREEN.withAlpha(0.9),
+            //         silhouetteSize: 1,
+            //         // featureIdLabel: 'name',
+            //         modelMatrix: Cesium.Transforms.headingPitchRollToFixedFrame(
+            //             Cesium.Cartesian3.fromDegrees(long, lat, height * 0.4),
+            //             headingPositionRoll,
+            //             Cesium.Ellipsoid.WGS84,
+            //             fixedFrameTransform
+            //         ),
+            //         minimumPixelSize: 50,
+            //     }).then((model) => {
+            //         this.modelPrimitiveCollection.add(model);
+            //         // animations.start.addEventListener(function (model, animation) {
+            //         //     console.log(`Animation started: ${animation.name}`);
+            //         // });
+            //         model.readyEvent.addEventListener(() => {
+            //             // model.activeAnimations.add({
+            //             //     index: 0, // animations.length - 1,
+            //             //     loop: Cesium.ModelAnimationLoop.REPEAT,
+            //             //     multiplier: 0.5,
+            //             // });
+            //             // const animations = model.activeAnimations;
+            //             // const length = animations.length;
+            //             // for (let i = 0; i < length; ++i) {
+            //             //     console.log('播放动画名称', animations.get(i).name);
+            //             // }
+            //             model.activeAnimations.addAll({
+            //                 multiplier: 1,                            // Play at half-speed
+            //                 loop: Cesium.ModelAnimationLoop.REPEAT      // Loop the animations
+            //             });
+            //         });
+            //     })
+            // } catch (error) {
+            //     console.log(`Failed to load model. ${error}`);
+            // }
+
         })
 
-
-
         // let theCanvasImage = theCanvas.toDataURL()
-
         let detailInfo = _drawCanvasImageDetailInfo(staffData)
         this.myCustomLabelDataSource.entities.add({
             show: isShow,
@@ -261,8 +461,6 @@ export class StaffManage {
                 horizontalOrigin: Cesium.HorizontalOrigin.CENTER, // //相对于对象的原点（注意是原点的位置）的水平位置
                 // verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
             },
-
-
 
             // label: {
             //     //文字标签
@@ -294,10 +492,7 @@ export class StaffManage {
         });
 
         // _drawCanvasImageDetailInfo(staffData).then(res => {})
-
-
-
-        //用primitive的方式添加线段
+        // 用primitive的方式添加线段
         // this.primitiveCollection.add(new Cesium.Primitive({
         //     name:theTxt,
         //     id: id,
@@ -487,8 +682,12 @@ function _drawCanvasImageDetailInfo(staffData) {
     context.fillStyle = 'white'; // 文本颜色
     let rwInfo = staffData.workPlanName; // 要绘制的文本
     context.fillText(rwInfo, 100, 192); // 绘制文本
-
     let dataUrl = canvas.toDataURL(); // 这将返回一个 Data URL 字符串
-    return dataUrl
 
+    return dataUrl
+}
+
+//睡眠函数
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms))
 }

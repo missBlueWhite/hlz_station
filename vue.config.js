@@ -7,9 +7,10 @@ module.exports = {
   lintOnSave: false, // 是否开启eslint
   devServer: {
     headers: {
-        'Cross-Origin-Embedder-Policy': 'require-corp',
-        'Cross-Origin-Opener-Policy': 'same-origin'
-      },
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+      'Cross-Origin-Opener-Policy': 'same-origin'
+    },
+    port: 8086,
     // proxy: {
     //   // 两种写法都可以
     //   // 代理请求， 匹配所有以/uums开头的请求
