@@ -330,13 +330,62 @@ const sleep = (time: number) => {
 
 //更新所有的人员信息的位置
 let setTimIntervalIndex
+// const updateAllStaffPosition = async () => {
+//   if (!staffManageInstance) {
+//     staffManageInstance = new StaffManage(_viewer)
+//   }
+//   //更新频率  两秒请求一次接口
+//   setTimIntervalIndex = setInterval(() => {
+//     let staffListRes = []
+//     let originPoint = [113.5493956319916, 22.79948679264272, 0.46735028600700784]
+//     let colors = ['#DF5D5D', '#67DF5D', '#5DDFCE', '#3668B1', '#AD4ECB', '#E77B4F', '#9189D0', '#EA91A4']
+//     let typeNameList = ['安监部监督人', '省级到岗', '地市到岗', '工作班成员', '工作负责人', '设备部监督人', '县级到岗', '运检部监督人']
+//     let centerPointList = [
+//       [113.52921733495529, 22.800116860285616, -1.5081470232585377],
+//       [113.54117399137431, 22.80142973544119, 4.637629094364569],
+//       [113.56124820736514, 22.80435789438329, 3.132505723890629],
+//       [113.54751992958181, 22.805140002373346, 2.3600184408125617],
+//       [113.55316928015714, 22.80546220633305, 13.940619346345267],
+//       [113.55864671621023, 22.81078628143312, 45.6525841996821],
+//       [113.5660295586771, 22.807353875058034, 40.493010328602494],
+//       [113.52900272911997, 22.788773176003975, 8.451228577763636],
+//     ]
+//     for (let i = 0; i < 10; i++) {
+//       let randomInteger = Math.floor(Math.random() * 8);
+//       // 获取经度和纬度
+//       let longitude = originPoint[0] + Math.random() * 0.01;
+//       let latitude = originPoint[1] + Math.random() * 0.01;
+//       let height = 10 // cartographic.height; // 高度
+//       let staffItem = {
+//         name: '张三' + i,
+//         relationWorkPlanid: '003da06c' + i,
+//         level: Math.floor(Math.random() * 5) + 1,
+//         point: [longitude, latitude, height],
+//         typeName: typeNameList[randomInteger],// "工作负责人",
+//         unitName: "超高压",
+//         area: "750kv交流区",
+//         workPlanName: "升级改造",
+//         color: colors[randomInteger], // "#FFCDFF",
+//         type: "Addupdate",
+//         centerPoint: centerPointList[randomInteger],
+//         isAlarm: Math.random() > 0.5 ? false : true
+//       }
+//       staffListRes.push(staffItem)
+//     }
+//     staffManageInstance.updataStaffList(staffListRes)
+//     console.log('updateAllStaffPosition--------------')
+//   }, 2000)
+// }
+
+
 const updateAllStaffPosition = async () => {
   if (!staffManageInstance) {
     staffManageInstance = new StaffManage(_viewer)
   }
   //更新频率  两秒请求一次接口
+
   setTimIntervalIndex = setInterval(() => {
-    let staffListRes = []
+    let staffListRes = []   //模拟更新的数据结果
     let originPoint = [113.5493956319916, 22.79948679264272, 0.46735028600700784]
     let colors = ['#DF5D5D', '#67DF5D', '#5DDFCE', '#3668B1', '#AD4ECB', '#E77B4F', '#9189D0', '#EA91A4']
     let typeNameList = ['安监部监督人', '省级到岗', '地市到岗', '工作班成员', '工作负责人', '设备部监督人', '县级到岗', '运检部监督人']
@@ -372,7 +421,7 @@ const updateAllStaffPosition = async () => {
       }
       staffListRes.push(staffItem)
     }
-    staffManageInstance.updataStaffList(staffListRes)
+    // staffManageInstance.updataStaffList(staffListRes)
     console.log('updateAllStaffPosition--------------')
   }, 2000)
 
