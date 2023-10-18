@@ -745,9 +745,9 @@ export class udCesium {
     // 目标位置
     let destination = new Cesium.Cartesian3(location[0], location[1], location[2])
     // 目标方向（heading）、俯仰角（pitch）和滚转角（roll）（以弧度为单位）
-    let heading = 5.308404061280836 // Cesium.Math.toRadians(90); // 90度的方向（东方）
-    let pitch = -0.23916330581563505 // Cesium.Math.toRadians(30); // 30度的俯仰角
-    let roll = 6.283182406437241; // 转角
+    let heading = 5.696926553252786 // Cesium.Math.toRadians(90); // 90度的方向（东方）
+    let pitch = -0.4453451701210285 // Cesium.Math.toRadians(30); // 30度的俯仰角
+    let roll = 6.283183887226359; // 转角
     // viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(Cesium.Cartesian3.fromDegrees(location.position[0], location.position[1], location.position[2]), 500 + location.offset / 10))
     // 使用camera.flyTo进行飞行
     viewer.camera.flyTo({

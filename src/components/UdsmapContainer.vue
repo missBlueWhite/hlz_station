@@ -93,7 +93,7 @@ const loadUdsModel = async (viewer: any) => {
     offsetPosition: [6, 25, -517.2]  //内网仓吉模型的纠偏量
     // offsetPosition: [0, 0, -9.2],
   };
-  csEulee.loadUds(udsModel, [68534.36702072641, 4544158.915943371, 4460432.1562001])
+  csEulee.loadUds(udsModel, [68907.37926017602, 4544354.173619255, 4460328.0496263765])
   // csEulee.loadUds(udsModel)
 }
 
@@ -152,26 +152,26 @@ const initMap = (container: HTMLElement) => {
   }, 6000)
 
 
-  // // 创建一个函数，用于更新相机信息
-  // function updateCameraInfo() {
-  //   // 获取当前相机
-  //   var camera = _viewer.camera;
-  //   // 打印相机的位置和方向
-  //   console.log('Camera Position:', camera.position);
-  //   console.log('Camera Direction:', camera.direction);
-  //   console.log('Camera Up:', camera.up);
-  //   console.log('Camera Right:', camera.right);
+  // 创建一个函数，用于更新相机信息
+  function updateCameraInfo() {
+    // 获取当前相机
+    var camera = _viewer.camera;
+    // 打印相机的位置和方向
+    console.log('Camera Position:', camera.position);
+    console.log('Camera Direction:', camera.direction);
+    console.log('Camera Up:', camera.up);
+    console.log('Camera Right:', camera.right);
 
-  //   // 打印相机的方位角、俯仰角和滚转角（以弧度为单位）
-  //   console.log('Camera Heading (Radians):', camera.heading);
-  //   console.log('Camera Pitch (Radians):', camera.pitch);
-  //   console.log('Camera Roll (Radians):', camera.roll);
-  //   // 使用requestAnimationFrame继续更新相机信息
-  //   requestAnimationFrame(updateCameraInfo);
-  // }
+    // 打印相机的方位角、俯仰角和滚转角（以弧度为单位）
+    console.log('Camera Heading (Radians):', camera.heading);
+    console.log('Camera Pitch (Radians):', camera.pitch);
+    console.log('Camera Roll (Radians):', camera.roll);
+    // 使用requestAnimationFrame继续更新相机信息
+    requestAnimationFrame(updateCameraInfo);
+  }
 
-  // // 启动相机信息更新
-  // updateCameraInfo();
+  // 启动相机信息更新
+  updateCameraInfo();
 
 }
 

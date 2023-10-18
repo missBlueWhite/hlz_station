@@ -386,8 +386,16 @@ export class StaffManage {
         // let findInstance2 = this.viewer.entities.getById(staffData.id)
 
         if (!findInstance) return;
+        //先获取到当前相机的视角  再定位过去
+        let heading = this.viewer.camera.heading
+        let pitch =  this.viewer.camera.pitch
+        let roll =  this.viewer.camera.roll
         //定位到该entity
-        this.viewer.zoomTo(findInstance);
+        this.viewer.zoomTo(findInstance,{
+            heading:heading,
+            pitch:pitch,
+            roll:roll
+        });
     }
 }
 
