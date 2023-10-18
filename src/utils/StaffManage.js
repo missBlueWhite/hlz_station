@@ -388,14 +388,27 @@ export class StaffManage {
         if (!findInstance) return;
         //先获取到当前相机的视角  再定位过去
         let heading = this.viewer.camera.heading
-        let pitch =  this.viewer.camera.pitch
-        let roll =  this.viewer.camera.roll
+        let pitch = this.viewer.camera.pitch
+        let roll = this.viewer.camera.roll
         //定位到该entity
-        this.viewer.zoomTo(findInstance,{
-            heading:heading,
-            pitch:pitch,
-            roll:roll
+
+        // console.log(findInstance.position._value)
+        // this.viewer.zoomTo(findInstance,{
+        //     heading:heading,
+        //     pitch:pitch,
+        //     roll:roll
+        // });
+
+        this.viewer.camera.flyTo({
+            destination: new Cesium.Cartesian3(findInstance.position._value.x, findInstance.position._value.y, findInstance.position._value.z + 100),   // Cesium.Cartographic.toCartesian(targetPosition),
+            // maximumHeight: 1800,
+            orientation: {
+                heading: heading,
+                pitch: pitch,
+                roll: roll
+            }
         });
+
     }
 }
 
