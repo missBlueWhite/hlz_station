@@ -6,7 +6,7 @@ import * as Cesium from "cesium";
 export class SceneAreaManager {
     constructor(viewer, options) {
         this.viewer = viewer;
-        this.myCustomAreaDataSource = new Cesium.CustomDataSource('areaCollection'); //用来存放所有的标注点
+        this.myCustomAreaDataSource = new Cesium.CustomDataSource('areaCollection'); 
         this.viewer.dataSources.add(this.myCustomAreaDataSource);
         this.initAreaRange()
         this.initHeigtAreaRange()
