@@ -64,20 +64,20 @@ export class StaffManage {
             let findLabelInstance = findListLabelInstance.getById(listData[i].relationWorkPlanid + 'lable')
             if (findPreStaff && findInstance && findLabelInstance) {
                 this._updataStaffPositonWithPositionProperty(startTime, findPreStaff, listData[i], findInstance, findLabelInstance)
-                // this._updataStaffPositonWithCallback(findPreStaff, listData[i], findInstance, findLabelInstance)
             }
         }
 
         this.viewer.clock.shouldAnimate = true;
+        // this.viewer.clock.clockRange = Cesium.ClockRange.CLAMPED;  // 时间结束了，再继续重复来一遍
 
         //位置更新完之后  重新更新this.preStaffList的数据
-        for (let k = 0; k < listData.length; k++) {
-            this.preStaffList.push({
-                relationWorkPlanid: listData[k].relationWorkPlanid,
-                point: listData[k].point,
-                centerPoint: listData[k].centerPoint
-            })
-        }
+        // for (let k = 0; k < listData.length; k++) {
+        //     this.preStaffList.push({
+        //         relationWorkPlanid: listData[k].relationWorkPlanid,
+        //         point: listData[k].point,
+        //         centerPoint: listData[k].centerPoint
+        //     })
+        // }
 
         // // 进行人员的更新
         // let findListInstance = this.viewer.dataSources.getByName('staffListCollection')[0].entities
@@ -123,8 +123,8 @@ export class StaffManage {
     _updataStaffPositonWithPositionProperty(start, oldInfo, newInfo, entity, entityLabel) {
         let positionsOld = Cesium.Cartesian3.fromDegrees(oldInfo.point[0], oldInfo.point[1], oldInfo.point[2]);
         let positionsNew = Cesium.Cartesian3.fromDegrees(newInfo.point[0], newInfo.point[1], newInfo.point[2]);
-        let numberOfSamples = 100;
-        let totalSeconds = 3;  //动画时间执行完毕
+        let numberOfSamples = 400;
+        let totalSeconds = 2;  //动画时间执行完毕
         let positionsProperty = new Cesium.SampledPositionProperty();
         for (let i = 0; i <= numberOfSamples; ++i) {
             const factor = i / numberOfSamples;

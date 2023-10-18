@@ -152,29 +152,28 @@ const initMap = (container: HTMLElement) => {
   }, 6000)
 
 
-  // 创建一个函数，用于更新相机信息
-  function updateCameraInfo() {
-    // 获取当前相机
-    var camera = _viewer.camera;
+  // // 创建一个函数，用于更新相机信息
+  // function updateCameraInfo() {
+  //   // 获取当前相机
+  //   var camera = _viewer.camera;
 
-    // 打印相机的位置和方向
-    console.log('Camera Position:', camera.position);
-    console.log('Camera Direction:', camera.direction);
-    console.log('Camera Up:', camera.up);
-    console.log('Camera Right:', camera.right);
+  //   // 打印相机的位置和方向
+  //   console.log('Camera Position:', camera.position);
+  //   console.log('Camera Direction:', camera.direction);
+  //   console.log('Camera Up:', camera.up);
+  //   console.log('Camera Right:', camera.right);
 
-    // 打印相机的方位角、俯仰角和滚转角（以弧度为单位）
-    console.log('Camera Heading (Radians):', camera.heading);
-    console.log('Camera Pitch (Radians):', camera.pitch);
-    console.log('Camera Roll (Radians):', camera.roll);
+  //   // 打印相机的方位角、俯仰角和滚转角（以弧度为单位）
+  //   console.log('Camera Heading (Radians):', camera.heading);
+  //   console.log('Camera Pitch (Radians):', camera.pitch);
+  //   console.log('Camera Roll (Radians):', camera.roll);
 
+  //   // 使用requestAnimationFrame继续更新相机信息
+  //   requestAnimationFrame(updateCameraInfo);
+  // }
 
-    // 使用requestAnimationFrame继续更新相机信息
-    requestAnimationFrame(updateCameraInfo);
-  }
-
-  // 启动相机信息更新
-  updateCameraInfo();
+  // // 启动相机信息更新
+  // updateCameraInfo();
 
 
 }
@@ -351,7 +350,7 @@ const updateAllStaffPosition = async () => {
       [113.5660295586771, 22.807353875058034, 40.493010328602494],
       [113.52900272911997, 22.788773176003975, 8.451228577763636],
     ]
-    for (let i = 0; i < 60; i++) {
+    for (let i = 0; i < 10; i++) {
       let randomInteger = Math.floor(Math.random() * 8);
       // 获取经度和纬度
       let longitude = originPoint[0] + Math.random() * 0.01;
