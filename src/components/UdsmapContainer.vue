@@ -147,6 +147,8 @@ const initMap = (container: HTMLElement) => {
   // 隐藏 animation 控件
   _viewer.animation.container.style.visibility = 'hidden';
 
+  // _viewer.scene.globe.depthTestAgainstTerrain = true;  //开启深度检测
+
   setTimeout(() => {
     addDymicLine()
   }, 6000)

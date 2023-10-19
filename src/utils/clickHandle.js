@@ -161,6 +161,8 @@ export class MapClickHandler {
         if (!clickEntity.id.name) return
         //通过名称找打区域值中的数据
         let areaData = sceneList.find(item => item.name == clickEntity.id.name)
+        console.log('kkkkkkkk',areaData)
+        console.log('uuuuuuuuuu',clickEntity.id)
         let viewer = this.viewer
         // 目标位置
         let destination = new Cesium.Cartesian3(areaData.camera[0], areaData.camera[1], areaData.camera[2])

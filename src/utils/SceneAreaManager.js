@@ -6,7 +6,7 @@ import * as Cesium from "cesium";
 export class SceneAreaManager {
     constructor(viewer, options) {
         this.viewer = viewer;
-        this.myCustomAreaDataSource = new Cesium.CustomDataSource('areaCollection'); 
+        this.myCustomAreaDataSource = new Cesium.CustomDataSource('areaCollection');
         this.viewer.dataSources.add(this.myCustomAreaDataSource);
         this.initAreaRange()
         this.initHeigtAreaRange()
@@ -113,14 +113,15 @@ export class SceneAreaManager {
     initHeigtAreaRange() {
         // 绘制墙体
         for (let i = 0; i < sceneList.length; i++) {
+            console.log('初始化区域的面积的名字', sceneList[i].name)
             let positions = Cesium.Cartesian3.fromDegreesArray(sceneList[i].region);
             // let positions = Cesium.Cartesian3.fromDegreesArrayHeights(sceneList[i].region.push(30));
             this.myCustomAreaDataSource.entities.add({
-                // name: "heightPolygon" + i,
-                name:sceneList[i].name,
+                name: sceneList[i].name,
+                // id:sceneList[i].id,
                 type: 'heightPolygon',    // 图标
                 polygon: {
-                    hierarchy:positions,
+                    hierarchy: positions,
                     // hierarchy: Cesium.Cartesian3.fromDegreesArrayHeights([
                     //   -108.0,
                     //   42.0,
@@ -132,10 +133,10 @@ export class SceneAreaManager {
                     // extrudedHeight: 500000.0,
                     // material: Cesium.Color.GREEN,
                     // material: Cesium.Color.fromBytes(76, 212, 224).withAlpha(0.7),
-                    material : Cesium.Color.fromCssColorString(sceneList[i].color),
+                    material: Cesium.Color.fromCssColorString(sceneList[i].color),
                     closeTop: false,
                     closeBottom: false,
-                  },
+                },
             })
         }
     }
