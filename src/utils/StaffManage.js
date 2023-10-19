@@ -57,17 +57,20 @@ export class StaffManage {
         let findListInstance = this.viewer.dataSources.getByName('staffListCollection')[0].entities
         let findListLabelInstance = this.viewer.dataSources.getByName('staffListLabelCollection')[0].entities
         // 将人员之前的位置与需要更新的进行插值
-        let startTime = Cesium.JulianDate.fromDate(new Date());
+        // let startTime = Cesium.JulianDate.fromDate(new Date());
         for (let i = 0; i < listData.length; i++) {
             let findPreStaff = this.preStaffList.find(item => item.relationWorkPlanid == listData[i].relationWorkPlanid)
             let findInstance = findListInstance.getById(listData[i].relationWorkPlanid)
             let findLabelInstance = findListLabelInstance.getById(listData[i].relationWorkPlanid + 'lable')
             if (findPreStaff && findInstance && findLabelInstance) {
-                this._updataStaffPositonWithPositionProperty(startTime, findPreStaff, listData[i], findInstance, findLabelInstance)
+                this._updataStaffPositonWithPositionProperty(listData[i], findInstance, findLabelInstance)
             }
         }
 
         this.viewer.clock.shouldAnimate = true;
+        // this.viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP;
+
+        // 
         // this.viewer.clock.clockRange = Cesium.ClockRange.CLAMPED;  // 时间结束了，再继续重复来一遍
 
         //位置更新完之后  重新更新this.preStaffList的数据
@@ -119,32 +122,46 @@ export class StaffManage {
 
     }
 
-    //用SampledPositionProperty更新位置  目前感觉这个方式是最优的
-    _updataStaffPositonWithPositionProperty(start, oldInfo, newInfo, entity, entityLabel) {
-        let positionsOld = Cesium.Cartesian3.fromDegrees(oldInfo.point[0], oldInfo.point[1], oldInfo.point[2]);
-        let positionsNew = Cesium.Cartesian3.fromDegrees(newInfo.point[0], newInfo.point[1], newInfo.point[2]);
-        let numberOfSamples = 400;
-        let totalSeconds = 2;  //动画时间执行完毕
-        let positionsProperty = new Cesium.SampledPositionProperty();
-        for (let i = 0; i <= numberOfSamples; ++i) {
-            const factor = i / numberOfSamples;
-            const time = Cesium.JulianDate.addSeconds(
-                start,
-                factor * totalSeconds,
-                new Cesium.JulianDate()
-            );
-            const locationFactor = Math.pow(factor, 2);
-            const location = Cesium.Cartesian3.lerp(
-                positionsOld,  //传递的上一个坐标
-                positionsNew,  //传递的下一个坐标
-                locationFactor,
-                new Cesium.Cartesian3()
-            );
-            positionsProperty.addSample(time, location);
+    // //用SampledPositionProperty更新位置  目前感觉这个方式是最优的
+    // _updataStaffPositonWithPositionProperty(start, oldInfo, newInfo, entity, entityLabel) {
+    //     let positionsOld = Cesium.Cartesian3.fromDegrees(oldInfo.point[0], oldInfo.point[1], oldInfo.point[2]);
+    //     let positionsNew = Cesium.Cartesian3.fromDegrees(newInfo.point[0], newInfo.point[1], newInfo.point[2]);
+    //     let numberOfSamples = 400;
+    //     let totalSeconds = 2;  //动画时间执行完毕
+    //     let positionsProperty = new Cesium.SampledPositionProperty();
+    //     for (let i = 0; i <= numberOfSamples; ++i) {
+    //         const factor = i / numberOfSamples;
+    //         const time = Cesium.JulianDate.addSeconds(
+    //             start,
+    //             factor * totalSeconds,
+    //             new Cesium.JulianDate()
+    //         );
+    //         const locationFactor = Math.pow(factor, 2);
+    //         const location = Cesium.Cartesian3.lerp(
+    //             positionsOld,  //传递的上一个坐标
+    //             positionsNew,  //传递的下一个坐标
+    //             locationFactor,
+    //             new Cesium.Cartesian3()
+    //         );
+    //         positionsProperty.addSample(time, location);
+    //     }
+    //     entity.position = positionsProperty;          //最后更新entity实体的坐标位置
+    //     entity.orientation = new Cesium.VelocityOrientationProperty(positionsProperty)
+    //     entityLabel.position = positionsProperty;     //更新标注的位置
+    // }
+
+    _updataStaffPositonWithPositionProperty(staffData, entity, entityLabel) {
+        if(entity.position instanceof Cesium.SampledPositionProperty){
+            console.log('cccccccccccc')
+            // debugger
+            // entity.position.addSample()
+            entity.position.addSamples(staffData.times,staffData.positions)
+        }else{
+            console.log('vvvvvvvvvvvvvvvvvv')
+            entity.position = staffData.point;          //最后更新entity实体的坐标位置
+            entity.orientation = new Cesium.VelocityOrientationProperty(staffData.point)
+            entityLabel.position = staffData.point;     //更新标注的位置
         }
-        entity.position = positionsProperty;          //最后更新entity实体的坐标位置
-        entity.orientation = new Cesium.VelocityOrientationProperty(positionsProperty)
-        entityLabel.position = positionsProperty;     //更新标注的位置
     }
 
 

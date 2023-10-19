@@ -378,15 +378,14 @@ let setTimIntervalIndex
 // }
 
 
-const updateAllStaffPosition = async () => {
+const updateAllStaffPosition = () => {
   if (!staffManageInstance) {
     staffManageInstance = new StaffManage(_viewer)
   }
-  //更新频率  两秒请求一次接口
 
-  setTimIntervalIndex = setInterval(() => {
-    let staffListRes = []   //模拟更新的数据结果
+  function updateStaffFirst() {
     let originPoint = [113.5493956319916, 22.79948679264272, 0.46735028600700784]
+    let staffListRes = []   //模拟更新的数据结果
     let colors = ['#DF5D5D', '#67DF5D', '#5DDFCE', '#3668B1', '#AD4ECB', '#E77B4F', '#9189D0', '#EA91A4']
     let typeNameList = ['安监部监督人', '省级到岗', '地市到岗', '工作班成员', '工作负责人', '设备部监督人', '县级到岗', '运检部监督人']
     let centerPointList = [
@@ -399,17 +398,34 @@ const updateAllStaffPosition = async () => {
       [113.5660295586771, 22.807353875058034, 40.493010328602494],
       [113.52900272911997, 22.788773176003975, 8.451228577763636],
     ]
-    for (let i = 0; i < 10; i++) {
+    let startTime = new Cesium.JulianDate()
+    Cesium.JulianDate.fromDate(new Date(), startTime);
+    for (let k = 0; k < 60; k++) {
+      let staffName = '张三' + k;
+      let relationWorkPlanid = '003da06c' + k;
       let randomInteger = Math.floor(Math.random() * 8);
-      // 获取经度和纬度
-      let longitude = originPoint[0] + Math.random() * 0.01;
-      let latitude = originPoint[1] + Math.random() * 0.01;
-      let height = 10 // cartographic.height; // 高度
+      let positionsProperty = new Cesium.SampledPositionProperty();
+      for (let m = 0; m <= 2; m++) {
+        // 获取经度和纬度
+        let longitude = originPoint[0] + Math.random() * 0.008;
+        let latitude = originPoint[1] + Math.random() * 0.008;
+        let height = 10               // cartographic.height; // 高度
+        let addTimeSecond = 10
+        let location = new Cesium.Cartesian3.fromDegrees(longitude, latitude, height)
+        let endTime = new Cesium.JulianDate()
+        Cesium.JulianDate.addSeconds(
+          startTime,
+          addTimeSecond * m,
+          endTime
+        );
+        positionsProperty.addSample(endTime, location);
+      }
+
       let staffItem = {
-        name: '张三' + i,
-        relationWorkPlanid: '003da06c' + i,
+        name: staffName,
+        relationWorkPlanid: relationWorkPlanid,
         level: Math.floor(Math.random() * 5) + 1,
-        point: [longitude, latitude, height],
+        point: positionsProperty,
         typeName: typeNameList[randomInteger],// "工作负责人",
         unitName: "超高压",
         area: "750kv交流区",
@@ -421,9 +437,84 @@ const updateAllStaffPosition = async () => {
       }
       staffListRes.push(staffItem)
     }
-    // staffManageInstance.updataStaffList(staffListRes)
-    console.log('updateAllStaffPosition--------------')
-  }, 2000)
+
+    console.log('updateAllStaffPosition--------------333333')
+    staffManageInstance.updataStaffList(staffListRes)
+  }
+
+  function updateStaffInterval() {
+    let originPoint = [113.5493956319916, 22.79948679264272, 0.46735028600700784]
+    let staffListRes = []   //模拟更新的数据结果
+    let colors = ['#DF5D5D', '#67DF5D', '#5DDFCE', '#3668B1', '#AD4ECB', '#E77B4F', '#9189D0', '#EA91A4']
+    let typeNameList = ['安监部监督人', '省级到岗', '地市到岗', '工作班成员', '工作负责人', '设备部监督人', '县级到岗', '运检部监督人']
+    let centerPointList = [
+      [113.52921733495529, 22.800116860285616, -1.5081470232585377],
+      [113.54117399137431, 22.80142973544119, 4.637629094364569],
+      [113.56124820736514, 22.80435789438329, 3.132505723890629],
+      [113.54751992958181, 22.805140002373346, 2.3600184408125617],
+      [113.55316928015714, 22.80546220633305, 13.940619346345267],
+      [113.55864671621023, 22.81078628143312, 45.6525841996821],
+      [113.5660295586771, 22.807353875058034, 40.493010328602494],
+      [113.52900272911997, 22.788773176003975, 8.451228577763636],
+    ]
+    let startTime = new Cesium.JulianDate()
+    Cesium.JulianDate.fromDate(new Date(), startTime);
+    for (let k = 0; k < 60; k++) {
+      let staffName = '张三' + k;
+      let relationWorkPlanid = '003da06c' + k;
+      let randomInteger = Math.floor(Math.random() * 8);
+      // let positionsProperty = new Cesium.SampledPositionProperty();
+      let positions = []
+      let timeList = []
+      for (let m = 0; m <= 2; m++) {
+        // 获取经度和纬度
+        let longitude = originPoint[0] + Math.random() * 0.008;
+        let latitude = originPoint[1] + Math.random() * 0.008;
+        let height = 10               // cartographic.height; // 高度
+        let addTimeSecond = 10
+        let location = new Cesium.Cartesian3.fromDegrees(longitude, latitude, height)
+        positions.push(location)
+        let endTime = new Cesium.JulianDate()
+        Cesium.JulianDate.addSeconds(
+          startTime,
+          addTimeSecond * m,
+          endTime
+        );
+
+        timeList.push(endTime)
+        // positionsProperty.addSample(endTime, location);
+      }
+
+      let staffItem = {
+        name: staffName,
+        relationWorkPlanid: relationWorkPlanid,
+        level: Math.floor(Math.random() * 5) + 1,
+        // point: positionsProperty,
+        typeName: typeNameList[randomInteger],// "工作负责人",
+        positions: positions,
+        times: timeList,
+        unitName: "超高压",
+        area: "750kv交流区",
+        workPlanName: "升级改造",
+        color: colors[randomInteger], // "#FFCDFF",
+        type: "Addupdate",
+        centerPoint: centerPointList[randomInteger],
+        isAlarm: Math.random() > 0.5 ? false : true
+      }
+      staffListRes.push(staffItem)
+    }
+
+    console.log('updateAllStaffPosition--------------222222')
+    staffManageInstance.updataStaffList(staffListRes)
+  }
+
+  setTimIntervalIndex = setInterval(() => {
+    console.log('setInterval-------------------11111111')
+    updateStaffInterval()
+  }, 18000)
+  updateStaffFirst()
+
+
 
 }
 
