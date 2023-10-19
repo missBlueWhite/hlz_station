@@ -70,7 +70,6 @@ export class StaffManage {
         this.viewer.clock.shouldAnimate = true;
         // this.viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP;
 
-        // 
         // this.viewer.clock.clockRange = Cesium.ClockRange.CLAMPED;  // 时间结束了，再继续重复来一遍
 
         //位置更新完之后  重新更新this.preStaffList的数据
@@ -151,12 +150,12 @@ export class StaffManage {
     // }
 
     _updataStaffPositonWithPositionProperty(staffData, entity, entityLabel) {
-        if(entity.position instanceof Cesium.SampledPositionProperty){
+        if (entity.position instanceof Cesium.SampledPositionProperty) {
             console.log('cccccccccccc')
             // debugger
             // entity.position.addSample()
-            entity.position.addSamples(staffData.times,staffData.positions)
-        }else{
+            entity.position.addSamples(staffData.times, staffData.positions)
+        } else {
             console.log('vvvvvvvvvvvvvvvvvv')
             entity.position = staffData.point;          //最后更新entity实体的坐标位置
             entity.orientation = new Cesium.VelocityOrientationProperty(staffData.point)
