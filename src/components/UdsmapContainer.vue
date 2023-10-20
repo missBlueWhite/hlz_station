@@ -206,7 +206,6 @@ const addDymicLine = () => {
   _viewer.clock.currentTime = startTime.clone();
   _viewer.clock.multiplier = 1;
   _viewer.clock.shouldAnimate = true;
-
   _viewer.zoomTo(lineEntity);
 }
 
