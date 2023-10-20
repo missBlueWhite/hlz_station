@@ -21,6 +21,11 @@ export class SceneAreaManager {
             console.log('相机移动完成');
             let mapLevel = self.getZoomLevel()
             console.log('mapLevel', mapLevel)
+
+            // console.log('Camera Position:', self.viewer.camera.position);
+            // // 打印相机的方位角、俯仰角和滚转角（以弧度为单位）
+            // console.log('Camera Heading  Pitch  Roll(Radians):', self.viewer.camera.heading,self.viewer.camera.pitch,self.viewer.camera.roll);
+
             if (mapLevel < 16) {
                 // todo=>在此处进行场景的切换   展示全局的场景面板数据
                 console.log('全局的场景展示......')

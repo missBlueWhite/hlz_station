@@ -160,19 +160,19 @@ const initMap = (container: HTMLElement) => {
   //   var camera = _viewer.camera;
   //   // 打印相机的位置和方向
   //   console.log('Camera Position:', camera.position);
-  //   console.log('Camera Direction:', camera.direction);
-  //   console.log('Camera Up:', camera.up);
-  //   console.log('Camera Right:', camera.right);
-
+  //   // console.log('Camera Direction:', camera.direction);
+  //   // console.log('Camera Up:', camera.up);
+  //   // console.log('Camera Right:', camera.right);
   //   // 打印相机的方位角、俯仰角和滚转角（以弧度为单位）
-  //   console.log('Camera Heading (Radians):', camera.heading);
-  //   console.log('Camera Pitch (Radians):', camera.pitch);
-  //   console.log('Camera Roll (Radians):', camera.roll);
+  //   console.log('Camera Heading  Pitch  Roll(Radians):', camera.heading,camera.pitch,camera.roll);
+  //   // console.log('Camera Heading (Radians):', camera.heading,camera.pitch,camera.roll);
+  //   // console.log('Camera Pitch (Radians):', camera.pitch);
+  //   // console.log('Camera Roll (Radians):', camera.roll);
   //   // 使用requestAnimationFrame继续更新相机信息
   //   requestAnimationFrame(updateCameraInfo);
   // }
 
-  // // 启动相机信息更新
+  // 启动相机信息更新
   // updateCameraInfo();
 
 }
