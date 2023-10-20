@@ -11,9 +11,6 @@ import sbbjdr from "../assets/staffIcon/sbbjdr.png";  //设备部监督人
 import xjdg from "../assets/staffIcon/xjdg.png";  //县级到岗
 import yjbjdr from "../assets/staffIcon/yjbjdr.png";  //运检部监督人
 
-//临时的中心点
-let tempCenterPoint, tempStaffPoint
-//临时的坐标点位的点
 
 export class StaffManage {
     constructor(viewer, options) {
@@ -156,23 +153,22 @@ export class StaffManage {
 
     _updataStaffPositonWithPositionProperty(staffData, entity, entityLabel, lineEntity) {
         if (entity.position instanceof Cesium.SampledPositionProperty) {
-            console.log('cccccccccccc')
             entity.position.addSamples(staffData.times, staffData.positions)
-            // entity.polyline.positions = new Cesium.CallbackProperty(changePosition, false)
-
         } else {
-            console.log('vvvvvvvvvvvvvvvvvv')
             entity.position = staffData.point;          //最后更新entity实体的坐标位置
             entity.orientation = new Cesium.VelocityOrientationProperty(staffData.point)
             entityLabel.position = staffData.point;     //更新标注的位置
-            // entity.polyline.positions = ""
-            // 
         }
-        debugger
-        tempCenterPoint = [113.65331358323145,22.898124175810644]
-        tempStaffPoint = entity.position[entity.position.length - 1]
 
-        lineEntity.polyline.positions = new Cesium.CallbackProperty(changePosition, false)
+        //更新连线的位置
+        let center = staffData.centerPoint
+        lineEntity.polyline.positions = new Cesium.CallbackProperty((time) => {
+            let lon = center[0];
+            let lat = center[1];
+            let res = new Cesium.Cartesian3()
+            entity.position.getValue(time, res)
+            return [new Cesium.Cartesian3.fromDegrees(lon, lat), res]
+        }, false)
     }
 
 
@@ -722,7 +718,7 @@ function sleep(ms) {
 
 
 function cartesian3_to_WGS84(point) {
-    var cartesian3 = new Cesium.Cartesian3(point.x, point.y, point.z);
+    var cartesian3 = new Cesium.Cartesian3(point[0], point[1], point[2]);
     var cartographic = Cesium.Cartographic.fromCartesian(cartesian3);
     var lat = Cesium.Math.toDegrees(cartographic.latitude);
     var lng = Cesium.Math.toDegrees(cartographic.longitude);
@@ -736,20 +732,22 @@ function cartesian3_to_WGS84(point) {
 
 
 function changePosition(time, isConstant) {
-    let lat = 22.898124175810644;
-    let lon = 113.65331358323145;
-    debugger
-    let newPoint = cartesian3_to_WGS84(tempStaffPoint)
-    console.log('999999999999')
-    return Cesium.Cartesian3.fromDegreesArray(
-        [lon, lat, newPoint.lng, newPoint.lat],
-        Cesium.Ellipsoid.WGS84,
-        isConstant
-    );
-
+    let lat = 22.836646529455297
+    let lon = 113.54250892361931;
+    // console.log(tempStaffPoint._property._values)
+    // let pointX = tempStaffPoint._property._values[tempStaffPoint._property._values.length - 3]
+    // let pointY = tempStaffPoint._property._values[tempStaffPoint._property._values.length - 2]
+    // let pointZ = tempStaffPoint._property._values[tempStaffPoint._property._values.length - 1]
+    let res = new Cesium.Cartesian3()
+    tempStaffPoint.getValue(time, res)
+    console.log(res)
+    // let newPoint = cartesian3_to_WGS84([pointX, pointY, pointZ])
     // return Cesium.Cartesian3.fromDegreesArray(
-    //     [lon, lat, lon - Math.floor(Math.random() * 10), lat - Math.floor(Math.random() * 10)],
+    //     [lon, lat, newPoint.lng, newPoint.lat],
     //     Cesium.Ellipsoid.WGS84,
     //     isConstant
     // );
+    // console.log([lon, lat, pointX, pointY])
+    return [new Cesium.Cartesian3.fromDegrees(lon, lat), res]
+
 }
