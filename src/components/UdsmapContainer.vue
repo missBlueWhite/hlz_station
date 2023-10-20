@@ -139,6 +139,7 @@ const initMap = (container: HTMLElement) => {
   // let localImageProvider = new Cesium.UrlTemplateImageryProvider({
   //   url: 'http://10.11.4.20/MapServer/mbtiles/arcgis_yx_jiangsu1-17/{x}/{y}/{z}', //服务地址
   // })
+  
   // _viewer.imageryLayers.addImageryProvider(localImageProvider);
 
   window.udsMapviewer = _viewer;
