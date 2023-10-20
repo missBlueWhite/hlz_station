@@ -10,6 +10,11 @@ import gzfzr from "../assets/staffIcon/gzfzr.png";  //工作负责人
 import sbbjdr from "../assets/staffIcon/sbbjdr.png";  //设备部监督人
 import xjdg from "../assets/staffIcon/xjdg.png";  //县级到岗
 import yjbjdr from "../assets/staffIcon/yjbjdr.png";  //运检部监督人
+
+//临时的中心点
+let tempCenterPoint, tempStaffPoint
+//临时的坐标点位的点
+
 export class StaffManage {
     constructor(viewer, options) {
         this.viewer = viewer;
@@ -161,9 +166,13 @@ export class StaffManage {
             entity.orientation = new Cesium.VelocityOrientationProperty(staffData.point)
             entityLabel.position = staffData.point;     //更新标注的位置
             // entity.polyline.positions = ""
-            debugger
+            // 
         }
-        lineEntity.polyline.positions = new Cesium.CallbackProperty(changePosition, entity.position, false)
+        debugger
+        tempCenterPoint = [113.65331358323145,22.898124175810644]
+        tempStaffPoint = entity.position[entity.position.length - 1]
+
+        lineEntity.polyline.positions = new Cesium.CallbackProperty(changePosition, false)
     }
 
 
@@ -729,17 +738,18 @@ function cartesian3_to_WGS84(point) {
 function changePosition(time, isConstant) {
     let lat = 22.898124175810644;
     let lon = 113.65331358323145;
-    // let newPoint = cartesian3_to_WGS84(staffPoint[staffPoint.length - 1])
+    debugger
+    let newPoint = cartesian3_to_WGS84(tempStaffPoint)
     console.log('999999999999')
-    // return Cesium.Cartesian3.fromDegreesArray(
-    //     [lon, lat, newPoint.lng, newPoint.lat],
-    //     Cesium.Ellipsoid.WGS84,
-    //     isConstant
-    // );
-
     return Cesium.Cartesian3.fromDegreesArray(
-        [lon, lat, lon - Math.floor(Math.random() * 10), lat - Math.floor(Math.random() *  10)],
+        [lon, lat, newPoint.lng, newPoint.lat],
         Cesium.Ellipsoid.WGS84,
         isConstant
     );
+
+    // return Cesium.Cartesian3.fromDegreesArray(
+    //     [lon, lat, lon - Math.floor(Math.random() * 10), lat - Math.floor(Math.random() * 10)],
+    //     Cesium.Ellipsoid.WGS84,
+    //     isConstant
+    // );
 }
