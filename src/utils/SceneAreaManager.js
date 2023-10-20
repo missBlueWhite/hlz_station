@@ -138,16 +138,6 @@ export class SceneAreaManager {
                 type: 'heightPolygon',    // 图标
                 polygon: {
                     hierarchy: positions,
-                    // hierarchy: Cesium.Cartesian3.fromDegreesArrayHeights([
-                    //   -108.0,
-                    //   42.0,
-                    //   -100.0,
-                    //   42.0,
-                    //   -104.0,
-                    //   40.0,
-                    // ]),
-                    // extrudedHeight: 500000.0,
-                    // material: Cesium.Color.GREEN,
                     material: Cesium.Color.fromBytes(76, 212, 224).withAlpha(0.7),
                     // material: Cesium.Color.fromCssColorString(sceneList[i].color),
                     extrudedHeight: 30,
