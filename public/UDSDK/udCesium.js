@@ -338,8 +338,8 @@ void main()
   update(frameState) {
     const context = frameState.context
     //console.log("context.cavas", context.cavas);
-    const width = context.canvas.clientWidth
-    const height = context.canvas.clientHeight
+    const width = context.canvas.clientWidth*0.8
+    const height = context.canvas.clientHeight*0.8
     const firstRun = this._colourTextureGL == null
     const sizeChanged = this._width != width || this._height != height
     if (firstRun || sizeChanged) {
