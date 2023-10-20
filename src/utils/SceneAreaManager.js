@@ -148,10 +148,12 @@ export class SceneAreaManager {
                     // ]),
                     // extrudedHeight: 500000.0,
                     // material: Cesium.Color.GREEN,
-                    // material: Cesium.Color.fromBytes(76, 212, 224).withAlpha(0.7),
-                    material: Cesium.Color.fromCssColorString(sceneList[i].color),
-                    closeTop: false,
+                    material: Cesium.Color.fromBytes(76, 212, 224).withAlpha(0.7),
+                    // material: Cesium.Color.fromCssColorString(sceneList[i].color),
+                    extrudedHeight: 30,
+                    closeTop: true,
                     closeBottom: false,
+                    // heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
                 },
             })
         }

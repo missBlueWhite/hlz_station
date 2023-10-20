@@ -28,6 +28,7 @@ export class MapClickHandler {
             let ray = viewer.camera.getPickRay(movement.position)
             let cartesianGlobePick = viewer.scene.globe.pick(ray, viewer.scene)
             let cartesianPickPosition = viewer.scene.pickPosition(movement.position)
+            // var pickObj = viewer.scene.pickFromRay(ray, viewer.scene);
             let pickObj = viewer.scene.pick(movement.position)
             if (Cesium.defined(pickObj) && pickObj.id?.id) {
                 // let clickResId = this.handerClick(pickObj)
