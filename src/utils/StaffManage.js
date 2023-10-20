@@ -726,13 +726,19 @@ function cartesian3_to_WGS84(point) {
 }
 
 
-function changePosition(time, staffPoint, isConstant) {
+function changePosition(time, isConstant) {
     let lat = 22.898124175810644;
     let lon = 113.65331358323145;
-    let newPoint = cartesian3_to_WGS84(staffPoint[staffPoint.length - 1])
-    debugger
+    // let newPoint = cartesian3_to_WGS84(staffPoint[staffPoint.length - 1])
+    console.log('999999999999')
+    // return Cesium.Cartesian3.fromDegreesArray(
+    //     [lon, lat, newPoint.lng, newPoint.lat],
+    //     Cesium.Ellipsoid.WGS84,
+    //     isConstant
+    // );
+
     return Cesium.Cartesian3.fromDegreesArray(
-        [lon, lat, newPoint.lng, newPoint.lat],
+        [lon, lat, lon - Math.floor(Math.random() * 10), lat - Math.floor(Math.random() *  10)],
         Cesium.Ellipsoid.WGS84,
         isConstant
     );
