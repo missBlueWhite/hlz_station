@@ -8,6 +8,10 @@ export class SceneAreaManager {
         this.viewer = viewer;
         this.myCustomAreaDataSource = new Cesium.CustomDataSource('areaCollection');
         this.viewer.dataSources.add(this.myCustomAreaDataSource);
+        this.myCustomDynamicAreaDataSource = new Cesium.CustomDataSource('areaDynamicCollection');
+        this.viewer.dataSources.add(this.myCustomDynamicAreaDataSource);
+        this.myCustomDynamicAreaPointSource = new Cesium.CustomDataSource('areaPointCollection');
+        this.viewer.dataSources.add(this.myCustomDynamicAreaPointSource);
         this.initAreaRange()
         this.initHeigtAreaRange()
         this.initAreaCenter()
@@ -25,15 +29,22 @@ export class SceneAreaManager {
             // console.log('Camera Position:', self.viewer.camera.position);
             // // 打印相机的方位角、俯仰角和滚转角（以弧度为单位）
             // console.log('Camera Heading  Pitch  Roll(Radians):', self.viewer.camera.heading,self.viewer.camera.pitch,self.viewer.camera.roll);
-
             if (mapLevel < 16) {
                 // todo=>在此处进行场景的切换   展示全局的场景面板数据
                 console.log('全局的场景展示......')
                 let staffDataSources = self.viewer.dataSources.getByName('areaCollection')[0]
+                let staffDynamicDataSources = self.viewer.dataSources.getByName('areaDynamicCollection')[0]
+                let pointDynamicDataSources = self.viewer.dataSources.getByName('areaPointCollection')[0]
                 staffDataSources.show = true
+                staffDynamicDataSources.show = true
+                pointDynamicDataSources.show = true
             } else {
                 let staffDataSources = self.viewer.dataSources.getByName('areaCollection')[0]
+                let staffDynamicDataSources = self.viewer.dataSources.getByName('areaDynamicCollection')[0]
+                let pointDynamicDataSources = self.viewer.dataSources.getByName('areaPointCollection')[0]
                 staffDataSources.show = false
+                staffDynamicDataSources.show = false
+                pointDynamicDataSources.show = false
                 let centerPoint = self.getCenterScreenPoint()
                 console.log('centerPoint', centerPoint)
                 if (!centerPoint || centerPoint.length === 0) return;
@@ -151,7 +162,7 @@ export class SceneAreaManager {
         // 绘制墙体
         for (let i = 0; i < sceneList.length; i++) {
             let positions = Cesium.Cartesian3.fromDegreesArray(sceneList[i].region);
-            this.viewer.entities.add({
+            this.myCustomDynamicAreaDataSource.entities.add({
                 name: "wall" + i,
                 wall: {
                     positions: positions,
@@ -172,43 +183,47 @@ export class SceneAreaManager {
     initAreaCenter() {
         for (let i = 0; i < sceneList.length; i++) {
             let centerPoint = sceneList[i].center
-            // 定义圆的参数
-            let center = Cesium.Cartesian3.fromDegrees(centerPoint[0], centerPoint[1]); // 圆心的地理坐标
-            let semiMajorAxis = 3.0; // 圆的半长轴（单位：米）
-            let semiMinorAxis = 3.0; // 圆的半短轴（单位：米）
-            let rotation = Cesium.Math.toRadians(45.0); // 圆的旋转角度
-            let granularity = Cesium.Math.toRadians(1.0); // 圆的细节程度
-            // 创建圆的几何对象
-            let circleGeometry = new Cesium.EllipseGeometry({
-                center: center,
-                semiMajorAxis: semiMajorAxis,
-                semiMinorAxis: semiMinorAxis,
-                rotation: rotation,
-                granularity: granularity,
-                height: 0.0 // 圆的高度（设置为0表示贴地）
-            });
+            // // 定义圆的参数
+            // let center = Cesium.Cartesian3.fromDegrees(centerPoint[0], centerPoint[1]); // 圆心的地理坐标
+            // let semiMajorAxis = 3.0; // 圆的半长轴（单位：米）
+            // let semiMinorAxis = 3.0; // 圆的半短轴（单位：米）
+            // let rotation = Cesium.Math.toRadians(45.0); // 圆的旋转角度
+            // let granularity = Cesium.Math.toRadians(1.0); // 圆的细节程度
+            // // 创建圆的几何对象
+            // let circleGeometry = new Cesium.EllipseGeometry({
+            //     center: center,
+            //     semiMajorAxis: semiMajorAxis,
+            //     semiMinorAxis: semiMinorAxis,
+            //     rotation: rotation,
+            //     granularity: granularity,
+            //     height: 0.0 // 圆的高度（设置为0表示贴地）
+            // });
 
-            // 创建圆的几何实例
-            let circleInstance = new Cesium.GeometryInstance({
-                geometry: circleGeometry,
-                id: 'circle',
-                attributes: {
-                    color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.RED) // 圆的颜色
-                }
-            });
+            // // 创建圆的几何实例
+            // let circleInstance = new Cesium.GeometryInstance({
+            //     geometry: circleGeometry,
+            //     id: 'circle',
+            //     attributes: {
+            //         color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.RED) // 圆的颜色
+            //     }
+            // });
 
-            // 创建贴地的圆Primitive
-            let circlePrimitive = new Cesium.GroundPrimitive({
-                geometryInstances: circleInstance
-            });
+            // // 创建贴地的圆Primitive
+            // let circlePrimitive = new Cesium.GroundPrimitive({
+            //     geometryInstances: circleInstance
+            // });
 
-            // 添加圆Primitive到场景
-            this.viewer.scene.primitives.add(circlePrimitive);
+            // // 添加圆Primitive到场景
+            // this.viewer.scene.primitives.add(circlePrimitive);
 
             //添加点位的图标
-            this.viewer.entities.add({
+            this.myCustomDynamicAreaPointSource.entities.add({
                 name: "areaCenterPoint" + i,
                 position: Cesium.Cartesian3.fromDegrees(centerPoint[0], centerPoint[1], 0),
+                // point: {
+                //     pixelSize: 10,
+                //     color: Cesium.Color.fromCssColorString(sceneList[i].color),
+                // },
                 billboard: {
                     image: centerPointPng,
                     width: 36,  //50  60

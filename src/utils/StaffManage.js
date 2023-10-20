@@ -10,6 +10,7 @@ import gzfzr from "../assets/staffIcon/gzfzr.png";  //工作负责人
 import sbbjdr from "../assets/staffIcon/sbbjdr.png";  //设备部监督人
 import xjdg from "../assets/staffIcon/xjdg.png";  //县级到岗
 import yjbjdr from "../assets/staffIcon/yjbjdr.png";  //运检部监督人
+import play from "../assets/staffIcon/play.png";  //运检部监督人
 export class StaffManage {
     constructor(viewer, options) {
         this.viewer = viewer;
@@ -203,7 +204,7 @@ export class StaffManage {
                 type: 'staff',    // 图标
                 billboard: {
                     image: res,
-                    width: 125,  //50  60
+                    width: 140,  //50  60
                     height: 25,
                     // heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
                     horizontalOrigin: Cesium.HorizontalOrigin.CENTER, // //相对于对象的原点（注意是原点的位置）的水平位置
@@ -252,7 +253,7 @@ export class StaffManage {
             type: 'staff_detailLabel',       // 图标
             billboard: {
                 image: detailInfo,
-                width: 125,  //50  60
+                width: 140,  //50  60
                 height: 110,
                 pixelOffset: new Cesium.Cartesian2(0, -50),
                 pixelOffsetScaleByDistance: new Cesium.NearFarScalar(1.5e2, 1.5, 1.5e7, 0.0),
@@ -416,13 +417,14 @@ export class StaffManage {
 function _drawCanvasImageName(staffData) {
     // 创建一个 Canvas 元素并绘制内容
     let canvas = document.createElement('canvas');
-    canvas.width = 250; // Canvas 的宽度
+    canvas.width = 280; // Canvas 的宽度
     canvas.height = 50; // Canvas 的高度
     let context = canvas.getContext('2d');
     context.fillStyle = '#23262ca3';  //背景颜色
     context.fillRect(0, 0, canvas.width, canvas.height);
     // 设置图片源
     let image = new Image();
+    let playImage = new Image();
     if (staffData.typeName == '安监部监督人') {
         image.src = ajbjdr  // 替换为你的图片路径
     } else if (staffData.typeName == '设备部监督人') {
@@ -431,6 +433,7 @@ function _drawCanvasImageName(staffData) {
         image.src = yjbjdr  // 替换为你的图片路径
     } else if (staffData.typeName == '工作负责人') {
         image.src = gzfzr  // 替换为你的图片路径
+        playImage.src = play
     } else if (staffData.typeName == '工作班成员') {
         image.src = gzbcy  // 替换为你的图片路径
     } else if (staffData.typeName == '省级到岗') {
@@ -455,8 +458,19 @@ function _drawCanvasImageName(staffData) {
             context.fillText(textLabel, 40, 32); // 绘制文本
             let textName = staffData.name; // 要绘制的文本
             context.fillText(textName, 150, 32); // 绘制文本
-            let dataUrl = canvas.toDataURL(); // 这将返回一个 Data URL 字符串
-            resolve(dataUrl)
+            // 绘制图片
+            if (staffData.typeName == '工作负责人') {
+                playImage.onload = function () {
+                    context.drawImage(playImage, 0, 0, 480, 480, 230, 4, 38, 38); // 在 Canvas 的左上角绘制图片
+                    let dataUrl = canvas.toDataURL(); // 这将返回一个 Data URL 字符串
+                    resolve(dataUrl)
+                }
+           
+            }else{
+                let dataUrl = canvas.toDataURL(); // 这将返回一个 Data URL 字符串
+                resolve(dataUrl)
+            }
+    
         };
     })
 
@@ -466,7 +480,7 @@ function _drawCanvasImageName(staffData) {
 function _drawCanvasImageDetailInfo(staffData) {
     // 创建一个 Canvas 元素并绘制内容
     let canvas = document.createElement('canvas');
-    canvas.width = 250; // Canvas 的宽度
+    canvas.width = 280; // Canvas 的宽度
     canvas.height = 220; // Canvas 的高度
     let context = canvas.getContext('2d');
     context.fillStyle = '#23262ca3';  //背景颜色
