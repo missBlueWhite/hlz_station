@@ -61,6 +61,7 @@ export class StaffManage {
         let findListLineInstance = this.viewer.dataSources.getByName('staffListLineCollection')[0].entities
         // 将人员之前的位置与需要更新的进行插值
         // let startTime = Cesium.JulianDate.fromDate(new Date());
+        this.viewer.clock.shouldAnimate = true;
         for (let i = 0; i < listData.length; i++) {
             let findPreStaff = this.preStaffList.find(item => item.relationWorkPlanid == listData[i].relationWorkPlanid)
             let findInstance = findListInstance.getById(listData[i].relationWorkPlanid)
@@ -71,7 +72,8 @@ export class StaffManage {
             }
         }
 
-        this.viewer.clock.shouldAnimate = true;
+
+
         // this.viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP;
         // this.viewer.clock.clockRange = Cesium.ClockRange.CLAMPED;  // 时间结束了，再继续重复来一遍
         //位置更新完之后  重新更新this.preStaffList的数据
@@ -152,23 +154,31 @@ export class StaffManage {
     // }
 
     _updataStaffPositonWithPositionProperty(staffData, entity, entityLabel, lineEntity) {
+
         if (entity.position instanceof Cesium.SampledPositionProperty) {
+            console.log('vvvvvvvvv')
             entity.position.addSamples(staffData.times, staffData.positions)
         } else {
+            console.log('ccccccccc')
             entity.position = staffData.point;          //最后更新entity实体的坐标位置
             entity.orientation = new Cesium.VelocityOrientationProperty(staffData.point)
             entityLabel.position = staffData.point;     //更新标注的位置
         }
+        
+        setTimeout(() => {
+            //更新连线的位置
+            let center = staffData.centerPoint
+            lineEntity.polyline.positions = new Cesium.CallbackProperty((time) => {
+                let lon = center[0];
+                let lat = center[1];
+                let res = new Cesium.Cartesian3(0, 0, 0)
+                if (entity.position instanceof Cesium.SampledPositionProperty) {
+                    entity.position.getValue(time, res)
+                }
+                return [new Cesium.Cartesian3.fromDegrees(lon, lat, 0), res]
+            }, false)
+        },5000)
 
-        //更新连线的位置
-        let center = staffData.centerPoint
-        lineEntity.polyline.positions = new Cesium.CallbackProperty((time) => {
-            let lon = center[0];
-            let lat = center[1];
-            let res = new Cesium.Cartesian3()
-            entity.position.getValue(time, res)
-            return [new Cesium.Cartesian3.fromDegrees(lon, lat), res]
-        }, false)
     }
 
 
@@ -208,8 +218,6 @@ export class StaffManage {
                 new Cesium.Cartesian3()
             );
         })
-
-
     }
 
 
@@ -288,7 +296,6 @@ export class StaffManage {
         if (!staffData) return;
         //进行单个人员的删除
         let findInstance = this.viewer.dataSources.getByName('staffListCollection')[0].entities.getById(staffData.relationWorkPlanid)
-        debugger
         if (!findInstance) return
         this.viewer.dataSources.getByName('staffListCollection')[0].entities.remove(findInstance)
     }
@@ -404,6 +411,10 @@ export class StaffManage {
                     clampToGround: true,
                     // maximumScale: 20000,//模型的最大比例尺大小。minimumPixelSize的上限  
                     incrementallyLoadTextures: true,//加载模型后纹理是否可以继续流入
+                    // outlineColor: Cesium.Color.RED,//模型边缘颜色
+                    color: Cesium.Color.fromCssColorString(staffData.color),  // Cesium.Color.RED,
+                    // silhouetteColor: Cesium.Color.GREEN.withAlpha(0.9),
+                    // silhouetteSize: 1,
                     // runAnimations: true,//是否启动模型中制定的gltf动画
                     // clampAnimations: true,//制定gltf动画是否在没有关键帧的持续时间内保持最后一个姿势
                     // shadows: Cesium.ShadowMode.ENABLED,
@@ -729,6 +740,7 @@ function cartesian3_to_WGS84(point) {
         alt: alt,
     };
 }
+
 
 
 function changePosition(time, isConstant) {

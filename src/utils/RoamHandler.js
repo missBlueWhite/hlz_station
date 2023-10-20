@@ -55,10 +55,8 @@ export class RoamHandler {
         trackData.forEach(function (data) {
             positionProperty.addSample(data.time, data.position);
         });
-
         // 将路径与实体关联
         entity.position = positionProperty;
-
         // 播放轨迹
         // viewer.clock = clock;
         viewer.clock.shouldAnimate = true; // 开始播放轨迹
@@ -87,7 +85,6 @@ export class RoamHandler {
         let roamDataSources = this.viewer.dataSources.getByName('roamListCollection')[0]
         if(!roamDataSources) return
         roamDataSources.entities.removeAll()
-
     }
 
     createRoamStaffPoint(point, personName, textBg) {

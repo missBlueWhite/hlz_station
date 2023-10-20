@@ -108,6 +108,7 @@ export class MapClickHandler {
         console.log('clickEntity', clickEntity)
         let viewer = this.viewer
         let position = clickEntity.id.position._value  //位置信息 Cartesian3
+        console.log('position', position)
         //从entity中获取相应的属性信息
         let name = params.name
         let level = params.level
