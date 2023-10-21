@@ -258,7 +258,7 @@ const staffManageFun = () => {
     [113.5660295586771, 22.807353875058034, 40.493010328602494],
     [113.52900272911997, 22.788773176003975, 8.451228577763636],
   ]
-  for (let i = 0; i < 60; i++) {
+  for (let i = 0; i < 160; i++) {
     let randomInteger = Math.floor(Math.random() * 8);
     // 获取经度和纬度
     let longitude = originPoint[0] + Math.random() * 0.01;
@@ -399,7 +399,7 @@ const updateAllStaffPosition = () => {
     ]
     let startTime = new Cesium.JulianDate()
     Cesium.JulianDate.fromDate(new Date(), startTime);
-    for (let k = 0; k < 60; k++) {
+    for (let k = 0; k < 160; k++) {
       let staffName = '张三' + k;
       let relationWorkPlanid = '003da06c' + k;
       let randomInteger = Math.floor(Math.random() * 8);
@@ -458,7 +458,7 @@ const updateAllStaffPosition = () => {
     ]
     let startTime = new Cesium.JulianDate()
     Cesium.JulianDate.fromDate(new Date(), startTime);
-    for (let k = 0; k < 60; k++) {
+    for (let k = 0; k < 160; k++) {
       let staffName = '张三' + k;
       let relationWorkPlanid = '003da06c' + k;
       let randomInteger = Math.floor(Math.random() * 8);
@@ -539,7 +539,7 @@ const continueAllStaffPosition = () => {
     ]
     let startTime = new Cesium.JulianDate()
     Cesium.JulianDate.fromDate(new Date(), startTime);
-    for (let k = 0; k < 60; k++) {
+    for (let k = 0; k < 160; k++) {
       let staffName = '张三' + k;
       let relationWorkPlanid = '003da06c' + k;
       let randomInteger = Math.floor(Math.random() * 8);

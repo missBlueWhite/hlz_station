@@ -655,12 +655,30 @@ class udCesium {
         [udsHeadMatrix[12], udsHeadMatrix[13], udsHeadMatrix[14], udsHeadMatrix[15]],
       ]);
 
+      //旋转矩阵
+      let angleInRadians = 45
+      const rotationMatrix = math.matrix([
+        [math.cos(angleInRadians), -math.sin(angleInRadians), 0, 0],
+        [math.sin(angleInRadians), math.cos(angleInRadians), 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]
+      ]);
+
+      console.log('旋转矩阵',rotationMatrix)
+
+
       let offsetMatrix = math.matrix([
         [1, 0, 0, 0],
         [0, 1, 0, 0],
         [0, 0, 1, 0],
         [model.offsetPosition[0], model.offsetPosition[1], model.offsetPosition[2], 1],
       ]);
+
+
+      let rotationAndOffset = math.multiply(offsetMatrix,rotationMatrix)
+
+      // transformationMatrix = math.multiply(transformationMatrix, rotationAndOffset)
+
       transformationMatrix = math.multiply(transformationMatrix, offsetMatrix)
       let lastMatrix = udGeoZone_TransformMatrix(
         transformationMatrix,

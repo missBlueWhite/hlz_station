@@ -57,6 +57,7 @@ export class StaffManage {
         if (!listData || listData.length === 0) return;
         // 进行人员的更新
         let findListInstance = this.viewer.dataSources.getByName('staffListCollection')[0].entities
+        // debugger
         let findListLabelInstance = this.viewer.dataSources.getByName('staffListLabelCollection')[0].entities
         let findListLineInstance = this.viewer.dataSources.getByName('staffListLineCollection')[0].entities
         // 将人员之前的位置与需要更新的进行插值
@@ -72,30 +73,21 @@ export class StaffManage {
             }
         }
 
-
-
-        // this.viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP;
-        // this.viewer.clock.clockRange = Cesium.ClockRange.CLAMPED;  // 时间结束了，再继续重复来一遍
-        //位置更新完之后  重新更新this.preStaffList的数据
-        // for (let k = 0; k < listData.length; k++) {
-        //     this.preStaffList.push({
-        //         relationWorkPlanid: listData[k].relationWorkPlanid,
-        //         point: listData[k].point,
-        //         centerPoint: listData[k].centerPoint
-        //     })
-        // }
-
-        // // 进行人员的更新
-        // let findListInstance = this.viewer.dataSources.getByName('staffListCollection')[0].entities
-        // let findListLabelInstance = this.viewer.dataSources.getByName('staffListLabelCollection')[0].entities
-        // let findListLineInstance = this.viewer.dataSources.getByName('staffListLineCollection')[0].entities
-        // for (let i = 0; i < listData.length; i++) {
-        //     let findInstance = findListInstance.getById(listData[i].relationWorkPlanid)
-        //     let findLabelInstance = findListLabelInstance.getById(listData[i].relationWorkPlanid + 'lable')
-        //     let findLineInstance = findListLineInstance.getById(listData[i].relationWorkPlanid + 'line')
-        //     if (findInstance && findLabelInstance && findLineInstance) {
-        //         this._updateSingleStaffEntity(findInstance, findLabelInstance, findLineInstance, listData[i])
-        //     }
+        //再重新更新一次
+        // for (let k = 0; k < findListInstance._entities.length; k++) {
+        //     console.log('ppppppppppppppppp')
+        //     // debugger
+        //     // findListInstance._entities._array[k].polyline.positions = new Cesium.CallbackProperty((time) => {
+        //     //     console.log('yyyyyyyyyyyyyyyyyyyyyyy')
+        //     //     let lon = listData.centerPoint[k][0];
+        //     //     let lat = listData.centerPoint[k][1];
+        //     //     let res = new Cesium.Cartesian3(0, 0, 0)
+        //     //     if (findListInstance._entities._array[k].position instanceof Cesium.SampledPositionProperty) {
+        //     //         findListInstance._entities._array[k].position.getValue(time, res)
+        //     //     }
+        //     //     return [new Cesium.Cartesian3.fromDegrees(lon, lat, 0), res]
+        //     // }, false)
+        //     console.log(findListInstance._entities._array[k].polyline.positions)
         // }
     }
 
@@ -154,70 +146,73 @@ export class StaffManage {
     // }
 
     _updataStaffPositonWithPositionProperty(staffData, entity, entityLabel, lineEntity) {
-
         if (entity.position instanceof Cesium.SampledPositionProperty) {
-            console.log('vvvvvvvvv')
+            console.log('vvvvvvvvv--------')
             entity.position.addSamples(staffData.times, staffData.positions)
+
         } else {
-            console.log('ccccccccc')
+            console.log('cccccccc')
             entity.position = staffData.point;          //最后更新entity实体的坐标位置
             entity.orientation = new Cesium.VelocityOrientationProperty(staffData.point)
             entityLabel.position = staffData.point;     //更新标注的位置
         }
-        
-        setTimeout(() => {
-            //更新连线的位置
-            let center = staffData.centerPoint
+
+
+        // if(lineEntity && lineEntity.polyline && lineEntity.polyline.positions){
+        //     debugger
+        //     lineEntity.polyline.positions = new Cesium.CallbackProperty((time) => {
+        //         let lon = center[0];
+        //         let lat = center[1];
+        //         let res = new Cesium.Cartesian3(0, 0, 0)
+        //         console.log('time',time)
+        //         debugger
+        //         console.log('22222222222222222')
+        //         entity.position.getValue(time, res)
+        //         console.log('333333333')
+        //         return [new Cesium.Cartesian3.fromDegrees(lon, lat, 0), res]
+        //     }, false)
+        // }
+
+        //更新连线的位置
+        let center = staffData.centerPoint
+        try {
             lineEntity.polyline.positions = new Cesium.CallbackProperty((time) => {
                 let lon = center[0];
                 let lat = center[1];
                 let res = new Cesium.Cartesian3(0, 0, 0)
-                if (entity.position instanceof Cesium.SampledPositionProperty) {
-                    entity.position.getValue(time, res)
-                }
+                console.log('time', time)
+                entity.position.getValue(time, res)
+                console.log('333333333')
                 return [new Cesium.Cartesian3.fromDegrees(lon, lat, 0), res]
             }, false)
-        },5000)
-
-    }
-
-
-    iii(oldInfo, newInfo) {
-        let startTime = Cesium.JulianDate.fromDate(new Date());
-        const getPosition = (startP, endP, duration) => {
-            return new Promise((resolve) => {
-                let arr = []
-                duration = duration * 1000
-                for (let i = 0; i <= duration; i = i++) {
-                    let pos = Cesium.Cartesian3.lerp(startP, endP, i / duration, new Cesium.Cartesian3());
-                    const time = Cesium.JulianDate.addSeconds(
-                        startTime,
-                        duration,
-                        new Cesium.JulianDate()
-                    );
-                    arr.push(pos)
-                }
-                // if (duration % forNum !== 0) {
-                //     arr.push(endP)
-                // }
-                resolve(arr);
-            })
+        } catch (err) {
+            console.log(err)
         }
 
+        // debugger
+        // console.log('ttttttttttttttttttttttt')
+        if (entity.polyline.positions instanceof Cesium.CallbackProperty) {
+            console.log('xxxxxxxxxxxxxxxxxxxxxxxxxx')
+        }
 
-        const po1 = Cesium.Cartesian3.fromDegrees(oldInfo.point[0], oldInfo.point[1], oldInfo.point[2])
-        const po2 = Cesium.Cartesian3.fromDegrees(newInfo.point[0], newInfo.point[1], newInfo.point[2])
-        getPosition(po1, po2, 2).then((res) => {
-            // showPath = showPath.concat(res)
-            // pathIndex++
-            // maxIndex = showPath.length
-            const location = Cesium.Cartesian3.lerp(
-                positionsOld,  //传递的上一个坐标
-                positionsNew,  //传递的下一个坐标
-                locationFactor,
-                new Cesium.Cartesian3()
-            );
-        })
+        // entity.polyline.positions = new Cesium.CallbackProperty(()=>{
+        //     return [new Cesium.Cartesian3(0, 0, 0),new Cesium.Cartesian3(0, 0, 0)]
+        // })
+        // console.log('position-----', lineEntity.polyline.positions)
+        // lineEntity.polyline.positions = newPositions
+
+        console.log('88888888888888888888888888')
+        //更新连线的位置
+        // entity.polyline.positions = await new Cesium.CallbackProperty((time) => {
+        //     console.log('yyyyyyyyyyyyyyyyyyyyyyy')
+        //     let lon = center[0];
+        //     let lat = center[1];
+        //     let res = new Cesium.Cartesian3(0, 0, 0)
+        //     if (entity.position instanceof Cesium.SampledPositionProperty) {
+        //         entity.position.getValue(time, res)
+        //     }
+        //     return [new Cesium.Cartesian3.fromDegrees(lon, lat, 0), res]
+        // }, false)
     }
 
 
@@ -280,6 +275,7 @@ export class StaffManage {
             ])
             lineFindInstance.polyline.positions = linePositions_tow;
         }
+
         // let linePositions = [];
         // linePositions.push(new Cesium.Cartesian3.fromDegrees(long, lat, 0));
         // linePositions.push(new Cesium.Cartesian3.fromDegrees(long, lat, height));
@@ -332,25 +328,30 @@ export class StaffManage {
         linePositions_tow.push(new Cesium.Cartesian3.fromDegrees(long, lat, staffData.point[2] * 0.3));
         if (staffData.centerPoint.length > 0) {
             linePositions_tow.push(new Cesium.Cartesian3.fromDegrees(staffData.centerPoint[0], staffData.centerPoint[1], staffData.centerPoint[2]));
-            if (staffData.isAlarm) {
-                this.myCustomLineDataSource.entities.add({
-                    id: id + 'line',
-                    polyline: {
-                        positions: linePositions_tow,
-                        width: 2,
-                        material: Cesium.Color.fromCssColorString("rgba(255, 0, 0, 1)") // 红色,
-                    }
-                })
-            } else {
-                this.myCustomLineDataSource.entities.add({
-                    id: id + 'line',
-                    polyline: {
-                        positions: linePositions_tow,
-                        width: 2,
-                        material: Cesium.Color.fromCssColorString("rgba(0, 255, 0, 1)") // 红色,
-                    }
-                })
-            }
+            // if (staffData.isAlarm) {
+            //     this.myCustomDataSource.entities.add({
+            //         id: id + 'line',
+            //         polyline: {
+            //             positions: new Cesium.CallbackProperty((time) => {
+            //                 return linePositions_tow
+            //             }, false),
+            //             width: 2,
+            //             material: Cesium.Color.fromCssColorString("rgba(255, 0, 0, 1)") // 红色,
+            //         }
+            //     })
+            // } else {
+            //     //myCustomLineDataSource myCustomDataSource
+            //     this.myCustomDataSource.entities.add({
+            //         id: id + 'line',
+            //         polyline: {
+            //             positions: new Cesium.CallbackProperty((time) => {
+            //                 return linePositions_tow
+            //             }, false),
+            //             width: 2,
+            //             material: Cesium.Color.fromCssColorString("rgba(0, 255, 0, 1)") // 红色,
+            //         }
+            //     })
+            // }
 
         }
 
@@ -369,6 +370,13 @@ export class StaffManage {
                     horizontalOrigin: Cesium.HorizontalOrigin.CENTER, // //相对于对象的原点（注意是原点的位置）的水平位置
                     verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
                     // verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+                },
+                polyline: {
+                    positions: new Cesium.CallbackProperty((time) => {
+                        return linePositions_tow
+                    }, false),
+                    width: 2,
+                    material: Cesium.Color.fromCssColorString("rgba(0, 255, 0, 1)") // 红色,
                 },
                 // label: {
                 //     //文字标签
