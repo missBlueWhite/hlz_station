@@ -12,9 +12,9 @@ export class SceneAreaManager {
         this.viewer.dataSources.add(this.myCustomDynamicAreaDataSource);
         this.myCustomDynamicAreaPointSource = new Cesium.CustomDataSource('areaPointCollection');
         this.viewer.dataSources.add(this.myCustomDynamicAreaPointSource);
-        this.initAreaRange()
-        this.initHeigtAreaRange()
-        this.initAreaCenter()
+        // this.initAreaRange()
+        // this.initHeigtAreaRange()
+        // this.initAreaCenter()
     }
 
     initMapAreaInsiteListen() {
