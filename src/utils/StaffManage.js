@@ -175,25 +175,32 @@ export class StaffManage {
 
         //更新连线的位置
         let center = staffData.centerPoint
-        try {
-            lineEntity.polyline.positions = new Cesium.CallbackProperty((time) => {
-                let lon = center[0];
-                let lat = center[1];
-                let res = new Cesium.Cartesian3(0, 0, 0)
-                console.log('time', time)
-                entity.position.getValue(time, res)
-                console.log('333333333')
-                return [new Cesium.Cartesian3.fromDegrees(lon, lat, 0), res]
-            }, false)
-        } catch (err) {
-            console.log(err)
-        }
+  
+
+        
+        setTimeout(()=> {
+            try {
+                entity.polyline.positions = new Cesium.CallbackProperty((time,result) => {
+                    let lon = center[0];
+                    let lat = center[1];
+                    let res = new Cesium.Cartesian3(0, 0, 0)
+                    console.log('time', time)
+                    entity.position.getValue(time, res)
+                    console.log('333333333')
+                    result = [new Cesium.Cartesian3.fromDegrees(lon, lat, 0), res]
+                    return result
+                }, false)
+            } catch (err) {
+                console.log(err)
+            }
+        },10000)
+
 
         // debugger
         // console.log('ttttttttttttttttttttttt')
-        if (entity.polyline.positions instanceof Cesium.CallbackProperty) {
-            console.log('xxxxxxxxxxxxxxxxxxxxxxxxxx')
-        }
+        // if (entity.polyline.positions instanceof Cesium.CallbackProperty) {
+        //     console.log('xxxxxxxxxxxxxxxxxxxxxxxxxx')
+        // }
 
         // entity.polyline.positions = new Cesium.CallbackProperty(()=>{
         //     return [new Cesium.Cartesian3(0, 0, 0),new Cesium.Cartesian3(0, 0, 0)]

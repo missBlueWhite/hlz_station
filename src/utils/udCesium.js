@@ -785,14 +785,14 @@ export class udCesium {
 
 
       //旋转矩阵
-      // let angleInRadians = 45
-      // const rotationMatrix = math.matrix([
-      //   [math.cos(angleInRadians), -math.sin(angleInRadians), 0, 0],
-      //   [math.sin(angleInRadians), math.cos(angleInRadians), 0, 0],
-      //   [0, 0, 1, 0],
-      //   [0, 0, 0, 1]
-      // ]);
-      // console.log('旋转矩阵',rotationMatrix)
+      let angleInRadians = 45
+      const rotationMatrix = math.matrix([
+        [math.cos(angleInRadians), -math.sin(angleInRadians), 0, 0],
+        [math.sin(angleInRadians), math.cos(angleInRadians), 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]
+      ]);
+      console.log('旋转矩阵',rotationMatrix)
 
       //平移矩阵
       let offsetMatrix = math.matrix([
@@ -803,9 +803,12 @@ export class udCesium {
       ]);
 
     
-      // let rotationAndOffset = math.multiply(offsetMatrix,rotationMatrix)
-      // transformationMatrix = math.multiply(rotationAndOffset,transformationMatrix)
-      transformationMatrix = math.multiply(transformationMatrix, offsetMatrix)
+      //let rotationAndOffset = math.multiply(rotationMatrix,offsetMatrix)
+      let rotationAndOffset = offsetMatrix
+      console.log("rotationAndOffset", rotationAndOffset);
+      transformationMatrix = math.multiply(transformationMatrix, rotationAndOffset)
+       
+      // transformationMatrix = math.multiply(transformationMatrix, offsetMatrix)
       let lastMatrix = udGeoZone_TransformMatrix(
         transformationMatrix,
         headerData.metadata.ProjectionID,
