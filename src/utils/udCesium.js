@@ -805,12 +805,12 @@ export class udCesium {
         [model.offsetPosition[0], model.offsetPosition[1], model.offsetPosition[2], 1],
       ]);
 
-      // let rotateAndOffsetMatrix = math.multiply(rotationMatrix2, offsetMatrix)
-      // transformationMatrix = math.multiply(transformationMatrix, rotationMatrix2)
-
-      // transformationMatrix = math.multiply(transformationMatrix, offsetMatrix)
+      let rotateAndOffsetMatrix = math.multiply(rotationMatrix2, offsetMatrix)
+      transformationMatrix = math.multiply(transformationMatrix, rotationMatrix2)
 
       transformationMatrix = math.multiply(transformationMatrix, offsetMatrix)
+
+      // transformationMatrix = math.multiply(transformationMatrix, offsetMatrix)
       let lastMatrix = udGeoZone_TransformMatrix(
         transformationMatrix,
         headerData.metadata.ProjectionID,
