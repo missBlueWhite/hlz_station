@@ -72,7 +72,7 @@ export class CameraManager {
         let id = cameraData.id;
         let long = cameraData.point[0]
         let lat = cameraData.point[1]
-        let height = cameraData.point[2] * 10
+        let height = cameraData.point[2]
         let theTxt = cameraData.name
         // 先画线后画点，防止线压盖点
         let linePositions = [];
@@ -105,11 +105,11 @@ export class CameraManager {
                 // disableDepthTestDistance: Number.POSITIVE_INFINITY
                 // distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 200)
             },
-            polyline: {
-                positions: linePositions,
-                width: 1,
-                // material: lineMaterial
-            }
+            // polyline: {
+            //     positions: linePositions,
+            //     width: 1,
+            //     // material: lineMaterial
+            // }
         });
 
 

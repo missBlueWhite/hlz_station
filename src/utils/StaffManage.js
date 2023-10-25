@@ -64,23 +64,46 @@ export class StaffManage {
     _updateSingleStaffEntity(findEntity, findDetailEntity, findLineEntity, staffData) {
         let lon = staffData.point[0]
         let lat = staffData.point[1]
-        let height = 10 // staffData.point[2] * 1.5
-        let newLinePositions = Cesium.Cartesian3.fromDegreesArrayHeights([
-            lon, lat, 0,   // 新的起始点经纬度
-            lon, lat, height   // 新的终点经纬度
-        ]);
+        let height = 10 
+        
+        // staffData.point[2] * 1.5
+        // let newLinePositions = Cesium.Cartesian3.fromDegreesArrayHeights([
+        //     lon, lat, 0,   // 新的起始点经纬度
+        //     lon, lat, height   // 新的终点经纬度
+        // ]);
 
         if (staffData.centerPoint.length > 0) {
-            let linePositions_tow = Cesium.Cartesian3.fromDegreesArrayHeights([
-                lon, lat, height,   // 新的终点经纬度
-                staffData.centerPoint[0], staffData.centerPoint[1], staffData.centerPoint[2]   // 新的终点经纬度
-            ])
+            // let linePositions_tow = Cesium.Cartesian3.fromDegreesArrayHeights([
+            //     lon, lat, height,   // 新的终点经纬度
+            //     staffData.centerPoint[0], staffData.centerPoint[1], staffData.centerPoint[2]   // 新的终点经纬度
+            // ])
             // 更改连线的位置
-            findLineEntity.polyline.positions = linePositions_tow;
+            findLineEntity.polyline.positions = new Cesium.CallbackProperty((time) => {
+                return Cesium.Cartesian3.fromDegreesArrayHeights([
+                    lon, lat, height,   // 新的终点经纬度
+                    staffData.centerPoint[0], staffData.centerPoint[1], staffData.centerPoint[2]   // 新的终点经纬度
+                ])
+            },false) ;
+
+            if(staffData.isAlarm){  //报警的红色
+                findLineEntity.polyline.material = new Cesium.ColorMaterialProperty(new Cesium.CallbackProperty((time) => {
+                    return  Cesium.Color.fromCssColorString("rgba(0, 255, 255, 1)")
+                }, false))
+            }else{  //不报警的绿色
+                findLineEntity.polyline.material = new Cesium.ColorMaterialProperty(new Cesium.CallbackProperty((time) => {
+                    return  Cesium.Color.fromCssColorString("rgba(0, 255, 0, 1)")
+                }, false))
+            }
+
         }
 
         // 更改竖直线的位置
-        findEntity.polyline.positions = newLinePositions;
+        findEntity.polyline.positions = new Cesium.CallbackProperty((time) => {
+            return Cesium.Cartesian3.fromDegreesArrayHeights([
+                lon, lat, 0,   // 新的起始点经纬度
+                lon, lat, height   // 新的终点经纬度
+            ]);
+        },false) ;;
         let newPosition = Cesium.Cartesian3.fromDegrees(lon, lat, height)
         // 找到单个实体的详细信息标注
         findDetailEntity.position.setValue(newPosition);
@@ -151,7 +174,7 @@ export class StaffManage {
         let id = staffData.relationWorkPlanid;
         let long = staffData.point[0]
         let lat = staffData.point[1]
-        let height = staffData.point[2] * 1.5
+        let height = 10 // staffData.point[2] * 1.5
         let theTxt = staffData.name  //名字
         let textBg = [0.38039, 0.364705, 0.388235, 0.5]
         if (staffData.level == '1') {
@@ -170,15 +193,19 @@ export class StaffManage {
         let linePositions = [];
         linePositions.push(new Cesium.Cartesian3.fromDegrees(long, lat, 0));
         linePositions.push(new Cesium.Cartesian3.fromDegrees(long, lat, height));
-        let linePositions_tow = []
-        linePositions_tow.push(new Cesium.Cartesian3.fromDegrees(long, lat, staffData.point[2]));
+        // let linePositions_tow = []
+        // linePositions_tow.push(new Cesium.Cartesian3.fromDegrees(long, lat, staffData.point[2]));
         if (staffData.centerPoint.length > 0) {
-            linePositions_tow.push(new Cesium.Cartesian3.fromDegrees(staffData.centerPoint[0], staffData.centerPoint[1], staffData.centerPoint[2]));
+            // linePositions_tow.push(new Cesium.Cartesian3.fromDegrees(staffData.centerPoint[0], staffData.centerPoint[1], staffData.centerPoint[2]));
             if (staffData.isAlarm) {
                 this.myCustomLineDataSource.entities.add({
                     id: id + 'line',
                     polyline: {
-                        positions: linePositions_tow,
+                        positions: new Cesium.CallbackProperty((time) => {
+                            // let linePositions_tow = []
+                            // linePositions_tow.push(new Cesium.Cartesian3.fromDegrees(staffData.centerPoint[0], staffData.centerPoint[1], staffData.centerPoint[2]));
+                            return [new Cesium.Cartesian3.fromDegrees(long, lat, staffData.point[2]),new Cesium.Cartesian3.fromDegrees(staffData.centerPoint[0], staffData.centerPoint[1], staffData.centerPoint[2])]
+                        },false) ,
                         width: 2,
                         material: Cesium.Color.fromCssColorString("rgba(255, 0, 0, 1)") // 红色,
                     }
@@ -187,7 +214,11 @@ export class StaffManage {
                 this.myCustomLineDataSource.entities.add({
                     id: id + 'line',
                     polyline: {
-                        positions: linePositions_tow,
+                        positions: new Cesium.CallbackProperty((time) => {
+                            // let linePositions_tow = []
+                            // linePositions_tow.push(new Cesium.Cartesian3.fromDegrees(staffData.centerPoint[0], staffData.centerPoint[1], staffData.centerPoint[2]));
+                            return [new Cesium.Cartesian3.fromDegrees(long, lat, staffData.point[2]),new Cesium.Cartesian3.fromDegrees(staffData.centerPoint[0], staffData.centerPoint[1], staffData.centerPoint[2])]
+                        },false) ,
                         width: 2,
                         material: Cesium.Color.fromCssColorString("rgba(0, 255, 0, 1)") // 红色,
                     }
@@ -388,9 +419,14 @@ export class StaffManage {
 
         if (!findInstance) return;
         //先获取到当前相机的视角  再定位过去
+        // let heading = this.viewer.camera.heading
+        // let pitch = this.viewer.camera.pitch
+        // let roll = this.viewer.camera.roll
+        //6.281977720903331 -1.5319512241989162 0
         let heading = this.viewer.camera.heading
         let pitch = this.viewer.camera.pitch
         let roll = this.viewer.camera.roll
+
         //定位到该entity
 
         // console.log(findInstance.position._value)

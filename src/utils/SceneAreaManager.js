@@ -1,4 +1,4 @@
-import { sceneList } from '../mockData/mockData.js'
+import { sceneList, alarmAreaList } from '../mockData/mockData.js'
 import { DynamicWallMaterialProperty } from './dynamicWallMaterialProperty.js'
 import centerPointPng from '../assets/mapIcon/centerPoint.png'
 import * as Cesium from "cesium";
@@ -12,8 +12,11 @@ export class SceneAreaManager {
         this.viewer.dataSources.add(this.myCustomDynamicAreaDataSource);
         this.myCustomDynamicAreaPointSource = new Cesium.CustomDataSource('areaPointCollection');
         this.viewer.dataSources.add(this.myCustomDynamicAreaPointSource);
+        this.myCustomAlarmAreaSource = new Cesium.CustomDataSource('areaAlarmCollection');
+        this.viewer.dataSources.add(this.myCustomAlarmAreaSource);
         this.initAreaRange()
         this.initHeigtAreaRange()
+        this.initAlarmAreaRange()
         this.initAreaCenter()
     }
 
@@ -42,9 +45,9 @@ export class SceneAreaManager {
                 let staffDataSources = self.viewer.dataSources.getByName('areaCollection')[0]
                 let staffDynamicDataSources = self.viewer.dataSources.getByName('areaDynamicCollection')[0]
                 let pointDynamicDataSources = self.viewer.dataSources.getByName('areaPointCollection')[0]
-                staffDataSources.show = false
-                staffDynamicDataSources.show = false
-                pointDynamicDataSources.show = false
+                // staffDataSources.show = false
+                // staffDynamicDataSources.show = false
+                // pointDynamicDataSources.show = false
                 let centerPoint = self.getCenterScreenPoint()
                 console.log('centerPoint', centerPoint)
                 if (!centerPoint || centerPoint.length === 0) return;
@@ -171,6 +174,39 @@ export class SceneAreaManager {
         }
     }
 
+    //初始化区域的报警范围
+    initAlarmAreaRange() {
+        for (let i = 0; i < alarmAreaList.length; i++) {
+            //fromDegreesArrayHeights
+            let positions = Cesium.Cartesian3.fromDegreesArray(alarmAreaList[i].region);
+            this.myCustomAlarmAreaSource.entities.add({
+                name: "alarmWall" + i,
+                wall: {
+                    positions: positions,
+                    // 设置高度
+                    maximumHeights: new Array(positions.length).fill(0.5),
+                    minimumHeights: new Array(positions.length).fill(-5),
+                    // material: Cesium.Color.fromBytes(225, 55, 55).withAlpha(0.5),
+                    material: Cesium.Color.fromCssColorString(sceneList[i].color),
+                    // material: new DynamicWallMaterialProperty({
+                    //     color: Cesium.Color.fromBytes(225, 55, 55).withAlpha(0.7),
+                    //     duration: 3000,
+                    //     viewer: this.viewer
+                    // }),
+                },
+                polygon:{
+                    hierarchy: positions,
+                    material: Cesium.Color.fromBytes(225, 55, 55).withAlpha(0.5),
+                    // material: Cesium.Color.fromCssColorString(sceneList[i].color),
+                    // extrudedHeight: 30,
+                    closeTop: true,
+                    closeBottom: false,
+                    // heightReference: Cesium.HeightReference.CLAMP_TO_GROUND
+                }
+            })
+        }
+    }
+
     //初始化区域的中心点
     initAreaCenter() {
         for (let i = 0; i < sceneList.length; i++) {
@@ -237,5 +273,15 @@ export class SceneAreaManager {
                 },
             });
         }
+    }
+
+    showAlarmArea() {
+        let alarmDataSources = self.viewer.dataSources.getByName('areaAlarmCollection')[0]
+        alarmDataSources.show = true
+    }
+
+    hideAlarmArea() {
+        let alarmDataSources = self.viewer.dataSources.getByName('areaAlarmCollection')[0]
+        alarmDataSources.show = false
     }
 }

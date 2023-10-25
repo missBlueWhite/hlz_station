@@ -13,10 +13,9 @@ proj4.defs("EPSG:32649", "+proj=utm +zone=49 +datum=WGS84 +units=m +no_defs");
 proj4.defs("EPSG:4547", "+proj=tmerc +lat_0=0 +lon_0=114 +k=1 +x_0=500000 +y_0=0 +ellps=GRS80 +units=m +no_defs +type=crs");
 proj4.defs("EPSG:4978", "+proj=geocent +datum=WGS84 +units=m +no_defs");
 proj4.defs("EPSG:32645", "+proj=utm +zone=45 +datum=WGS84 +units=m +no_defs +type=crs");
+
 function extractTransformComponents(transformationMatrix) {
-  const translation = math
-    .subset(transformationMatrix, math.index(math.range(0, 3), 3))
-    .toArray();
+  const translation = math.subset(transformationMatrix, math.index(3, math.range(0, 3)));
   const scaleMatrix = math.subset(
     transformationMatrix,
     math.index(math.range(0, 3), math.range(0, 3))
@@ -32,18 +31,18 @@ function extractTransformComponents(transformationMatrix) {
     .subset(scaleMatrix, math.index(math.range(0, 3), math.range(0, 3)))
     .map((value, index, matrix) => value / scale[index[0]]);
 
-  const trace = math.trace(rotationMatrix);
-  const r = math.sqrt(1 + trace);
-  const w = r / 2;
-  const x = (rotationMatrix.get([2, 1]) - rotationMatrix.get([1, 2])) / (2 * r);
-  const y = (rotationMatrix.get([0, 2]) - rotationMatrix.get([2, 0])) / (2 * r);
-  const z = (rotationMatrix.get([1, 0]) - rotationMatrix.get([0, 1])) / (2 * r);
-  const quaternion = math.matrix([x, y, z, w]);
+  // const trace = math.trace(rotationMatrix);
+  // const r = math.sqrt(1 + trace);
+  // const w = r / 2;
+  // const x = (rotationMatrix.get([2, 1]) - rotationMatrix.get([1, 2])) / (2 * r);
+  // const y = (rotationMatrix.get([0, 2]) - rotationMatrix.get([2, 0])) / (2 * r);
+  // const z = (rotationMatrix.get([1, 0]) - rotationMatrix.get([0, 1])) / (2 * r);
+  // const quaternion = math.matrix([x, y, z, w]);
 
   return {
     translation,
     scale,
-    quaternion,
+    rotationMatrix,
   };
 }
 
@@ -742,12 +741,15 @@ export class udCesium {
       return
     }
 
+
     // 目标位置
+    // let destination = Cesium.Cartesian3.fromDegrees(location[0], location[1], location[2]); // 你可以设置具体的经度、纬度和高度
+    // let destination = new Cesium.Cartesian3(68448.71261228583, 4543650.25812869, 4460972.65912344)
     let destination = new Cesium.Cartesian3(location[0], location[1], location[2])
     // 目标方向（heading）、俯仰角（pitch）和滚转角（roll）（以弧度为单位）
-    let heading = 5.696926553252786 // Cesium.Math.toRadians(90); // 90度的方向（东方）
-    let pitch = -0.4453451701210285 // Cesium.Math.toRadians(30); // 30度的俯仰角
-    let roll = 6.283183887226359; // 转角
+    let heading = 5.308404061280836 // Cesium.Math.toRadians(90); // 90度的方向（东方）
+    let pitch = -0.23916330581563505 // Cesium.Math.toRadians(30); // 30度的俯仰角
+    let roll = 6.283182406437241; // 转角
     // viewer.camera.flyToBoundingSphere(new Cesium.BoundingSphere(Cesium.Cartesian3.fromDegrees(location.position[0], location.position[1], location.position[2]), 500 + location.offset / 10))
     // 使用camera.flyTo进行飞行
     viewer.camera.flyTo({
@@ -780,21 +782,57 @@ export class udCesium {
         [udsHeadMatrix[12], udsHeadMatrix[13], udsHeadMatrix[14], udsHeadMatrix[15]],
       ]);
 
+      console.log("headerMatrix:", transformationMatrix);
+
+      let tsr = extractTransformComponents(transformationMatrix);
+      console.log("headerMatrix decompose:", tsr);
+      const rotMtx = tsr.rotationMatrix;
+      const transArray = tsr.translation._data[0];
+      const scaleArray = tsr.scale;
+      console.log("scaleArray:", scaleArray);
+
+      const rotationMatrix2 = math.matrix([
+        [rotMtx.get([0, 0]), rotMtx.get([0, 1]), rotMtx.get([0, 2]), 0.0],
+        [rotMtx.get([1, 0]), rotMtx.get([1, 1]), rotMtx.get([1, 2]), 0.0],
+        [rotMtx.get([2, 0]), rotMtx.get([2, 1]), rotMtx.get([2, 2]), 0.0],
+        [0.0, 0.0, 0.0, 1.0]]);
+      console.log("rotationMatrix2", rotationMatrix2);
 
       //旋转矩阵
-      let rotationMatrix = math.matrix([
-        [6.123234262925839e-17, 0, -1, 0],
-        [0, 1, 0, 0],
-        [1, 0, 6.123234262925839e-17, 0],
-        [0, 0, 0, 1],
+      let angleInRadians = Math.PI * 45 / 180.0;
+      const rotationMatrix45 = math.matrix([
+        [math.cos(angleInRadians), -math.sin(angleInRadians), 0, 0],
+        [math.sin(angleInRadians), math.cos(angleInRadians), 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]
       ]);
 
-      let rotationMatrix2 = math.matrix([
-        [6.123234262925839e-17, 0, 1, 0],
+      // console.log('旋转矩阵',rotationMatrix)
+      // console.log("offsetMatrixPre", tsr.translation);
+
+
+      let translationMatrix2 = math.matrix([
+        [1, 0, 0, 0],
         [0, 1, 0, 0],
-        [-1, 0, 6.123234262925839e-17, 0],
+        [0, 0, 1, 0],
+        [transArray[0], transArray[1], transArray[2], 1],
+      ]);
+      console.log("translationMatrix2", translationMatrix2);
+
+      let scaleMatrix2 = math.matrix([
+        [scaleArray[0], 0, 0, 0],
+        [0, scaleArray[1], 0, 0],
+        [0, 0, scaleArray[2], 0],
         [0, 0, 0, 1],
       ]);
+      console.log("scaleMatrix2", scaleMatrix2);
+
+      let combinedMatrix = math.multiply(rotationMatrix2, rotationMatrix45);
+      console.log("combinedMatrix1", combinedMatrix);
+      combinedMatrix = math.multiply(combinedMatrix, scaleMatrix2);
+      console.log("combinedMatrix2", combinedMatrix);
+      combinedMatrix = math.multiply(combinedMatrix, translationMatrix2);
+      console.log("combinedMatrix3", combinedMatrix);
 
 
       //平移矩阵
@@ -805,11 +843,10 @@ export class udCesium {
         [model.offsetPosition[0], model.offsetPosition[1], model.offsetPosition[2], 1],
       ]);
 
-      // let rotateAndOffsetMatrix = math.multiply(rotationMatrix2, offsetMatrix)
-      // transformationMatrix = math.multiply(transformationMatrix, rotationMatrix2)
-      // transformationMatrix = math.multiply(transformationMatrix, offsetMatrix)
+      combinedMatrix = math.multiply(combinedMatrix, offsetMatrix);
 
-      transformationMatrix = math.multiply(transformationMatrix, offsetMatrix)
+      transformationMatrix = combinedMatrix;
+      // transformationMatrix = math.multiply(transformationMatrix, offsetMatrix)
       let lastMatrix = udGeoZone_TransformMatrix(
         transformationMatrix,
         headerData.metadata.ProjectionID,

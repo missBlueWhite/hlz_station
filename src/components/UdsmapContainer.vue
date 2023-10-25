@@ -139,7 +139,7 @@ const initMap = (container: HTMLElement) => {
   // let localImageProvider = new Cesium.UrlTemplateImageryProvider({
   //   url: 'http://10.11.4.20/MapServer/mbtiles/arcgis_yx_jiangsu1-17/{x}/{y}/{z}', //服务地址
   // })
-  
+
   // _viewer.imageryLayers.addImageryProvider(localImageProvider);
 
   window.udsMapviewer = _viewer;
@@ -149,6 +149,26 @@ const initMap = (container: HTMLElement) => {
   _viewer.animation.container.style.visibility = 'hidden';
 
   // _viewer.scene.globe.depthTestAgainstTerrain = true;  //开启深度检测
+
+
+  
+
+  // let handler = new Cesium.ScreenSpaceEventHandler(_viewer.scene.canvas)
+  // handler.setInputAction(function (event: any) {
+  //   let ray = _viewer.camera.getPickRay(event.position);//获取一条射线
+  //   console.log("当前ray的数据：", ray);
+  //   let position = _viewer.scene.globe.pick(ray, _viewer.scene);
+  //   console.log("当前拾取的坐标：", position);
+  //   // 使用Cesium.Cartographic.fromCartesian方法将笛卡尔坐标转换为经纬度坐标
+  //   var cartographic = Cesium.Cartographic.fromCartesian(position);
+
+  //   // 从 cartographic 对象中获取经度、纬度和高度
+  //   var longitude = Cesium.Math.toDegrees(cartographic.longitude);
+  //   var latitude = Cesium.Math.toDegrees(cartographic.latitude);
+  //   var height = cartographic.height;
+  //   console.log('当前点的坐标值', longitude, latitude, height)
+  // }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
 
   setTimeout(() => {
     addDymicLine()
@@ -173,7 +193,7 @@ const initMap = (container: HTMLElement) => {
   //   requestAnimationFrame(updateCameraInfo);
   // }
 
-  // 启动相机信息更新
+  // // 启动相机信息更新
   // updateCameraInfo();
 
 }
@@ -244,6 +264,17 @@ const staffManageFun = () => {
   let west = Cesium.Cartesian3.fromDegrees(113.52072236815425, 22.790357359271056, 1.1299940307549188);
 
   //模拟数据 插值100个随机点////////////////////////////////////
+
+
+  let staffDataListMock = [
+    [89.12492035915312, 44.660039330413404, -0.000036432802169427474],
+    [89.12540675741315, 44.660046905201646, -0.000018194335799292753],
+    [89.12595879492466, 44.66004520578683, -0.0000363504715010463],
+    [89.12484194108762, 44.65958519438095, -0.000036450587759231834],
+    [89.12540618034016, 44.659575823848705, -0.00003632808300851261],
+    [89.12596898351892, 44.65956126006497, -0.0000364321421782763]
+  ]
+
   let staffListRes = []
   let originPoint = [89.12702533070753, 44.661725349674015, -2.6249673468814425]
   let colors = ['#DF5D5D', '#67DF5D', '#5DDFCE', '#3668B1', '#AD4ECB', '#E77B4F', '#9189D0', '#EA91A4']
@@ -269,6 +300,7 @@ const staffManageFun = () => {
       relationWorkPlanid: '003da06c' + i,
       level: Math.floor(Math.random() * 5) + 1,
       point: [longitude, latitude, height],
+      // point: staffDataListMock[i],
       typeName: typeNameList[randomInteger],// "工作负责人",
       unitName: "超高压",
       area: "750kv交流区",
@@ -476,6 +508,7 @@ onMounted(() => {
   //地图区域位置的监听
   sceneManageFun()
 
+
   let handler = new Cesium.ScreenSpaceEventHandler(_viewer.scene.canvas)
   handler.setInputAction((movement: any) => {
     let ray = _viewer.camera.getPickRay(movement.position)
@@ -517,6 +550,9 @@ onMounted(() => {
     }
 
   }, Cesium.ScreenSpaceEventType.LEFT_CLICK)
+
+
+
 
 
 
