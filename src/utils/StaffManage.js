@@ -98,12 +98,12 @@ export class StaffManage {
         }
 
         // 更改竖直线的位置
-        findEntity.polyline.positions = new Cesium.CallbackProperty((time) => {
-            return Cesium.Cartesian3.fromDegreesArrayHeights([
-                lon, lat, 0,   // 新的起始点经纬度
-                lon, lat, height   // 新的终点经纬度
-            ]);
-        },false) ;;
+        // findEntity.polyline.positions = new Cesium.CallbackProperty((time) => {
+        //     return Cesium.Cartesian3.fromDegreesArrayHeights([
+        //         lon, lat, 0,   // 新的起始点经纬度
+        //         lon, lat, height   // 新的终点经纬度
+        //     ]);
+        // },false) ;;
         let newPosition = Cesium.Cartesian3.fromDegrees(lon, lat, height)
         // 找到单个实体的详细信息标注
         findDetailEntity.position.setValue(newPosition);
@@ -237,6 +237,7 @@ export class StaffManage {
                     image: res,
                     width: 140,  //50  60
                     height: 25,
+                    pixelOffset: new Cesium.Cartesian2(0, -100),
                     // heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
                     horizontalOrigin: Cesium.HorizontalOrigin.CENTER, // //相对于对象的原点（注意是原点的位置）的水平位置
                     verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
@@ -263,10 +264,27 @@ export class StaffManage {
                 //     // disableDepthTestDistance: Number.POSITIVE_INFINITY
                 //     // distanceDisplayCondition: new Cesium.DistanceDisplayCondition(0, 200)
                 // },
-                polyline: {
-                    positions: linePositions,
-                    width: 1,
-                    // material: lineMaterial
+                // polyline: {
+                //     positions: linePositions,
+                //     width: 1,
+                //     // material: lineMaterial
+                // },
+
+                model: {
+                    uri: "./model/walk.glb",
+                    scale: 2,
+                    minimumPixelSize: 30, //最小像素大小，可以避免太小看不见
+                    clampToGround: true,
+                    // maximumScale: 20000,//模型的最大比例尺大小。minimumPixelSize的上限  
+                    incrementallyLoadTextures: true,//加载模型后纹理是否可以继续流入
+                    // outlineColor: Cesium.Color.RED,//模型边缘颜色
+                    color: Cesium.Color.fromCssColorString(staffData.color),  // Cesium.Color.RED,
+                    // silhouetteColor: Cesium.Color.GREEN.withAlpha(0.9),
+                    // silhouetteSize: 1,
+                    // runAnimations: true,//是否启动模型中制定的gltf动画
+                    // clampAnimations: true,//制定gltf动画是否在没有关键帧的持续时间内保持最后一个姿势
+                    // shadows: Cesium.ShadowMode.ENABLED,
+                    // heightReference: Cesium.HeightReference.NONE
                 },
             });
         })
@@ -286,7 +304,7 @@ export class StaffManage {
                 image: detailInfo,
                 width: 140,  //50  60
                 height: 110,
-                pixelOffset: new Cesium.Cartesian2(0, -50),
+                pixelOffset: new Cesium.Cartesian2(0, -120),
                 pixelOffsetScaleByDistance: new Cesium.NearFarScalar(1.5e2, 1.5, 1.5e7, 0.0),
                 // pixelOffsetScaleByDistance: new Cesium.NearFarScalar(100, 1.5, 300, 0),
                 // heightReference: Cesium.HeightReference.CLAMP_TO_GROUND,
