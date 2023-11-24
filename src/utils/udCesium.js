@@ -380,9 +380,11 @@ void main()
     }
 
     var v = frameState.camera.viewMatrix
+    console.log('viewMatrix---',v)
     udSDKJS_SetMatrix('view', v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15])
 
     v = frameState.camera.frustum.projectionMatrix
+    console.log('projectionMatrix---',v)
     udSDKJS_SetMatrix('projection', v[0], v[1], v[2], v[3], v[4], v[5], v[6], v[7], v[8], v[9], v[10], v[11], v[12], v[13], v[14], v[15])
 
 
@@ -786,9 +788,9 @@ export class udCesium {
       
       let tsr = extractTransformComponents(transformationMatrix);
       console.log("headerMatrix decompose:", tsr);
-      const rotMtx = tsr.rotationMatrix;
-      const transArray = tsr.translation._data[0];
-      const scaleArray = tsr.scale;
+      const rotMtx = tsr.rotationMatrix;             //旋转
+      const transArray = tsr.translation._data[0];   //缩放
+      const scaleArray = tsr.scale;                  //平移
       console.log("scaleArray:", scaleArray);
 
        const rotationMatrix2 = math.matrix([
@@ -799,16 +801,16 @@ export class udCesium {
       console.log("rotationMatrix2", rotationMatrix2);
 
       //旋转矩阵
-      let angleInRadians = Math.PI * 45 / 180.0;
+      let angleInRadians = Math.PI * 65 / 180.0;
       const rotationMatrix45 = math.matrix([
         [math.cos(angleInRadians), -math.sin(angleInRadians), 0, 0],
         [math.sin(angleInRadians), math.cos(angleInRadians), 0, 0],
         [0, 0, 1, 0],
         [0, 0, 0, 1]
       ]);
-      // console.log('旋转矩阵',rotationMatrix)
-      // console.log("offsetMatrixPre", tsr.translation);
-     
+
+      console.log('rotationMatrix45', rotationMatrix45)
+
 
       let translationMatrix2 = math.matrix([
         [1, 0, 0, 0],
